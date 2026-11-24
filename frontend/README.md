@@ -2,6 +2,8 @@
 
 Interfaz web de Vecinda desplegada en **Netlify** (Deploy Previews en PRs/ramas de prueba y `main` en producción).
 
+> Guía visual y wireframes por cajas: ver [DESIGN.md](DESIGN.md).
+
 ---
 
 ## Estructura de carpetas
