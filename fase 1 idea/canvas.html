@@ -1,0 +1,2152 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bussiness model canva Vecinda</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --ink: #111827;
+    --ink-border: #18181b;
+    --muted: #52606d;
+    --line: #e2e6ec;
+    --line-strong: #cbd2d9;
+    --brand: #0f766e;
+    --brand-d: #0b5a54;
+    --soft: #d9efec;
+    --ok: #15803d;
+    --ok-bg: #dcfce7;
+    --ok-bd: #bbf7d0;
+    --warn: #b45309;
+    --warn-bg: #fef3c7;
+    --warn-bd: #fde68a;
+    --bad: #b91c1c;
+    --bad-bg: #fee2e2;
+    --bad-bd: #fecaca;
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-sheet: 0 12px 36px rgba(15, 23, 42, 0.08);
+    --shadow-card: 0 4px 12px rgba(15, 23, 42, 0.1);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--bg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+  }
+
+  .app {
+    max-width: 1560px;
+    margin: 0 auto;
+    padding: 16px 20px 44px;
+  }
+
+  /* Barra superior compacta de herramientas */
+  .toolbar {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 11px 15px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .toolbar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .tool-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .group-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-right: 2px;
+  }
+
+  .btn {
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 6px 11px;
+    border-radius: 9px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background .15s, border-color .15s, transform .1s;
+  }
+
+  .btn:hover { background: var(--surface-soft); border-color: #9aa5b1; }
+  .btn:active { transform: translateY(1px); }
+
+  .btn.primary {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+  }
+  .btn.primary:hover { background: var(--brand-d); border-color: var(--brand-d); }
+
+  .btn.soft {
+    background: var(--soft);
+    border-color: transparent;
+    color: var(--brand-d);
+  }
+  .btn.soft:hover { background: #c5e8e4; }
+
+  .btn.active-toggle {
+    background: #18181b;
+    border-color: #18181b;
+    color: #fff;
+  }
+
+  .btn.danger {
+    color: var(--bad);
+    border-color: var(--bad-bd);
+    background: #fff8f8;
+  }
+  .btn.danger:hover { background: var(--bad-bg); }
+
+  .chip {
+    border: 1px solid var(--line-strong);
+    background: var(--surface-soft);
+    color: var(--ink);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all .15s ease;
+  }
+
+  .chip:hover { background: #eef2f6; }
+  .chip.active {
+    background: #18181b;
+    border-color: #18181b;
+    color: #fff;
+  }
+
+  .chip.corr-chip.active {
+    background: var(--corr-color, var(--brand));
+    border-color: var(--corr-color, var(--brand));
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 99px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    border: 1px solid var(--line-strong);
+    border-radius: 9px;
+    padding: 6px 10px;
+    font: inherit;
+    font-size: 12.5px;
+    min-width: 190px;
+    background: var(--surface-soft);
+    color: var(--ink);
+  }
+
+  .search-input:focus {
+    outline: 2px solid rgba(15, 118, 110, 0.22);
+    border-color: var(--brand);
+    background: #fff;
+  }
+
+  .toggle-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* Insight de correlación */
+  .corr-insight {
+    margin-bottom: 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--corr-color, var(--brand));
+    border-radius: 14px;
+    padding: 12px 16px;
+    box-shadow: var(--shadow-sm);
+    display: grid;
+    grid-template-columns: 1.45fr 1fr 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+
+  .corr-insight h2 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .corr-insight p { margin: 0; font-size: 12.5px; color: var(--muted); }
+
+  .insight-box {
+    background: var(--surface-soft);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 9px 11px;
+    font-size: 12px;
+  }
+
+  .insight-box strong {
+    display: block;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  /* LÁMINA PRINCIPAL DEL CANVAS (estilo plantilla subida) */
+  .bmc-sheet {
+    background: #ffffff;
+    border: 1px solid #e6e8ec;
+    border-radius: 22px;
+    padding: 26px 28px 24px;
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .sheet-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sheet-title {
+    margin: 0;
+    font-size: clamp(20px, 2.3vw, 31px);
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    color: #111111;
+    text-transform: uppercase;
+    line-height: 1.15;
+  }
+
+  .sheet-sub {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .mini-seg {
+    width: 110px;
+    height: 6px;
+    border-radius: 99px;
+    background: #e5e7eb;
+    overflow: hidden;
+    display: inline-flex;
+  }
+
+  .seg-def { background: var(--ok); }
+  .seg-hip { background: #f59e0b; }
+  .seg-ind { background: var(--bad); }
+
+  .canvas-stage {
+    position: relative;
+  }
+
+  .corr-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 6;
+    overflow: visible;
+  }
+
+  .bmc-board {
+    position: relative;
+    z-index: 2;
+  }
+
+  .bmc-top {
+    display: grid;
+    grid-template-columns: 1.12fr 0.92fr 1.14fr 0.92fr 1.12fr;
+    grid-template-rows: minmax(225px, auto) minmax(225px, auto);
+    gap: 14px;
+  }
+
+  .bmc-bottom {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* Posicionamiento Osterwalder dentro de .bmc-top */
+  .b-socios      { grid-column: 1 / 2; grid-row: 1 / 3; }
+  .b-actividades { grid-column: 2 / 3; grid-row: 1 / 2; }
+  .b-recursos    { grid-column: 2 / 3; grid-row: 2 / 3; }
+  .b-propuesta   { grid-column: 3 / 4; grid-row: 1 / 3; }
+  .b-relaciones  { grid-column: 4 / 5; grid-row: 1 / 2; }
+  .b-canales     { grid-column: 4 / 5; grid-row: 2 / 3; }
+  .b-segmentos   { grid-column: 5 / 6; grid-row: 1 / 3; }
+
+  /* Colores pastel exactos de la plantilla subida */
+  .b-socios      { background: #FCD25A; }
+  .b-actividades { background: #FBE5DE; }
+  .b-recursos    { background: #B5E2D1; }
+  .b-propuesta   { background: #8DCBF5; }
+  .b-relaciones  { background: #E5C29F; }
+  .b-canales     { background: #FAA6C7; }
+  .b-segmentos   { background: #DCF2B0; }
+  .b-costes      { background: #F47D92; min-height: 205px; }
+  .b-ingresos    { background: #FEEA9F; min-height: 205px; }
+
+  .block {
+    border: 1.8px solid var(--ink-border);
+    border-radius: 18px;
+    padding: 13px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    transition: opacity .2s ease, transform .15s ease, box-shadow .2s ease;
+    position: relative;
+  }
+
+  .block.block-dim {
+    opacity: 0.52;
+    filter: saturate(0.75);
+  }
+
+  .block.block-lit {
+    box-shadow: 0 0 0 2.5px var(--corr-color, var(--brand)), 0 10px 22px rgba(15, 23, 42, 0.12);
+  }
+
+  .block-head {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    padding: 0 26px;
+  }
+
+  .block-title {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #111111;
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  .block-add {
+    position: absolute;
+    right: 0;
+    top: -2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    border: 1px solid rgba(24, 24, 27, 0.22);
+    background: rgba(255, 255, 255, 0.65);
+    color: #111111;
+    font-weight: 800;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background .15s;
+  }
+
+  .block-add:hover { background: rgba(255, 255, 255, 0.95); }
+
+  .block-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .block-bar {
+    flex: 1;
+    max-width: 110px;
+    height: 4px;
+    border-radius: 99px;
+    background: rgba(24, 24, 27, 0.14);
+    overflow: hidden;
+    display: flex;
+  }
+
+  .block-count {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: rgba(17, 24, 39, 0.72);
+  }
+
+  .block-body {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex: 1;
+  }
+
+  .b-costes .block-body,
+  .b-ingresos .block-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+    align-content: start;
+    gap: 8px;
+  }
+
+  /* Tarjetas dentro de los bloques pastel */
+  .item {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(2px);
+    border: 1px solid rgba(24, 24, 27, 0.14);
+    border-radius: 10px;
+    padding: 7px 9px;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .15s ease, border-color .15s ease, opacity .2s ease, background .15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .item:hover {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(24, 24, 27, 0.45);
+    box-shadow: var(--shadow-card);
+    transform: translateY(-1px);
+  }
+
+  .item.dimmed {
+    opacity: 0.25;
+  }
+
+  .item.highlighted {
+    background: #ffffff;
+    border: 2px solid var(--corr-color, var(--brand));
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+  }
+
+  .item-row-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .item-title-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .st-dot {
+    font-size: 11px;
+    line-height: 1.3;
+    flex-shrink: 0;
+  }
+
+  .item-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.28;
+  }
+
+  .item-corr-dots {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+    padding-top: 3px;
+  }
+
+  .mini-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+
+  .item-desc {
+    font-size: 11.2px;
+    color: #374151;
+    line-height: 1.35;
+  }
+
+  .item-corrs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 1px;
+  }
+
+  .corr-pill {
+    font-size: 9.8px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 99px;
+    border: 1px solid currentColor;
+    background: rgba(255, 255, 255, 0.9);
+    white-space: nowrap;
+  }
+
+  .status-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 99px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+  }
+
+  .st-definido { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-bd); }
+  .st-hipotesis { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-bd); }
+  .st-indeterminado { background: var(--bad-bg); color: var(--bad); border: 1px solid var(--bad-bd); }
+
+  .empty-block {
+    font-size: 11.5px;
+    color: rgba(17, 24, 39, 0.65);
+    text-align: center;
+    padding: 14px 8px;
+    border: 1px dashed rgba(24, 24, 27, 0.25);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.45);
+  }
+
+  /* KPI strip debajo de la lámina */
+  .kpi-strip {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(150px, 1fr)) 1.5fr;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .kpi-card, .kpi-progress {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 11px 14px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+
+  .kpi-value {
+    font-size: 21px;
+    font-weight: 800;
+    margin-top: 2px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .kpi-value small { font-size: 12px; font-weight: 600; color: var(--muted); }
+
+  .seg-bar {
+    height: 10px;
+    border-radius: 99px;
+    background: var(--line);
+    overflow: hidden;
+    display: flex;
+    margin: 6px 0 4px;
+  }
+
+  .seg-bar > span { height: 100%; transition: width .25s ease; }
+
+  /* Sección inferior de diagnóstico y simulador */
+  .lower-grid {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr 1.05fr;
+    gap: 14px;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel h2 {
+    margin: 0;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-sub {
+    margin: -6px 0 0;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  .maturity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mat-row {
+    display: grid;
+    grid-template-columns: 156px 1fr 74px;
+    gap: 10px;
+    align-items: center;
+    font-size: 12px;
+  }
+
+  .mat-name {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .mat-swatch {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    border: 1px solid var(--ink-border);
+    flex-shrink: 0;
+  }
+
+  .mat-bar {
+    height: 9px;
+    border-radius: 99px;
+    background: var(--line);
+    overflow: hidden;
+    display: flex;
+  }
+
+  .mat-pct {
+    text-align: right;
+    font-size: 11.5px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .sim-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+  }
+
+  .sim-field label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .sim-field label strong { color: var(--ink); }
+  .sim-field input[type="range"] { width: 100%; accent-color: var(--brand); cursor: pointer; }
+
+  .sim-results {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .sim-metric {
+    background: var(--surface-soft);
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    padding: 10px 12px;
+  }
+
+  .sim-metric span {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .sim-metric strong {
+    display: block;
+    margin-top: 2px;
+    font-size: 18px;
+    color: var(--brand-d);
+  }
+
+  .hyp-note {
+    font-size: 11.5px;
+    color: var(--warn);
+    background: #fffbeb;
+    border: 1px dashed #f5d38a;
+    border-radius: 10px;
+    padding: 8px 10px;
+  }
+
+  .gaps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 330px;
+    overflow: auto;
+    padding-right: 2px;
+  }
+
+  .gap-item {
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    padding: 9px 11px;
+    background: var(--surface-soft);
+    cursor: pointer;
+    transition: border-color .15s;
+  }
+
+  .gap-item:hover { border-color: var(--brand); }
+
+  .gap-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+
+  .gap-block {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(2px);
+    display: none;
+    place-items: center;
+    padding: 16px;
+    z-index: 50;
+  }
+
+  .modal-backdrop.open { display: grid; }
+
+  .modal {
+    width: min(560px, 100%);
+    max-height: 92vh;
+    overflow: auto;
+    background: #fff;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .modal-head h3 { margin: 0; font-size: 17px; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .field input, .field select, .field textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 13px;
+    padding: 9px 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--ink);
+  }
+
+  .corr-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .corr-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--line-strong);
+    border-radius: 99px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .corr-check input { width: auto; margin: 0; }
+
+  .modal-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .error-banner {
+    background: var(--bad-bg);
+    border: 1px solid var(--bad-bd);
+    color: var(--bad);
+    border-radius: 14px;
+    padding: 18px;
+    margin: 24px auto;
+    max-width: 720px;
+    font-size: 14px;
+  }
+
+  @media (max-width: 1120px) {
+    .bmc-top {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: auto;
+    }
+    .b-socios, .b-actividades, .b-recursos, .b-propuesta, .b-relaciones, .b-canales, .b-segmentos {
+      grid-column: auto;
+      grid-row: auto;
+    }
+    .b-segmentos { grid-column: span 2; }
+    .bmc-bottom { grid-template-columns: 1fr; }
+    .corr-insight { grid-template-columns: 1fr; }
+    .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+    .kpi-progress { grid-column: 1 / -1; }
+    .lower-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 700px) {
+    .app { padding: 10px; }
+    .bmc-sheet { padding: 16px 14px; border-radius: 16px; }
+    .sheet-title { letter-spacing: 0.12em; }
+    .bmc-top { grid-template-columns: 1fr; }
+    .b-segmentos { grid-column: auto; }
+    .corr-svg { display: none; }
+    .form-grid, .sim-controls { grid-template-columns: 1fr; }
+    .mat-row { grid-template-columns: 124px 1fr 66px; }
+  }
+
+  @media print {
+    @page { size: A4 landscape; margin: 0; }
+    html, body {
+      background: #fff !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 297mm;
+      height: 210mm;
+      overflow: hidden;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .app { max-width: none; padding: 0; margin: 0; width: 297mm; height: 210mm; }
+    .toolbar, .corr-insight, .kpi-strip, .lower-grid, .block-add, .block-meta-row, .modal-backdrop, .item-desc, .item-corrs {
+      display: none !important;
+    }
+    .bmc-sheet {
+      box-shadow: none;
+      border: 0;
+      border-radius: 0;
+      padding: 16mm 18mm;
+      margin: 0;
+      width: 297mm;
+      height: 210mm;
+      display: flex;
+      flex-direction: column;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .sheet-header { margin-bottom: 5px; flex: 0 0 auto; }
+    .sheet-title { font-size: 15pt; letter-spacing: 0.18em; line-height: 1.1; }
+    .sheet-sub { display: none; }
+    .canvas-stage {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .bmc-board {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .bmc-top {
+      flex: 2.15 1 0;
+      min-height: 0;
+      grid-template-columns: 1.12fr 0.92fr 1.14fr 0.92fr 1.12fr !important;
+      grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) !important;
+      gap: 6px;
+    }
+    .b-socios      { grid-column: 1 / 2 !important; grid-row: 1 / 3 !important; }
+    .b-actividades { grid-column: 2 / 3 !important; grid-row: 1 / 2 !important; }
+    .b-recursos    { grid-column: 2 / 3 !important; grid-row: 2 / 3 !important; }
+    .b-propuesta   { grid-column: 3 / 4 !important; grid-row: 1 / 3 !important; }
+    .b-relaciones  { grid-column: 4 / 5 !important; grid-row: 1 / 2 !important; }
+    .b-canales     { grid-column: 4 / 5 !important; grid-row: 2 / 3 !important; }
+    .b-segmentos   { grid-column: 5 / 6 !important; grid-row: 1 / 3 !important; }
+    .bmc-bottom {
+      flex: 1 1 0;
+      min-height: 0;
+      margin-top: 0;
+      grid-template-columns: 1fr 1fr !important;
+      grid-template-rows: minmax(0, 1fr) !important;
+      gap: 6px;
+    }
+    .block {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      break-inside: avoid;
+      padding: 6px 7px;
+      border-radius: 11px;
+      border-width: 1.3px;
+      gap: 3.5px;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .block-head { padding: 0; gap: 0; }
+    .block-title { font-size: 7.6pt; letter-spacing: 0.03em; }
+    .block-body { gap: 3px; min-height: 0; }
+    .b-costes, .b-ingresos { min-height: 0; }
+    .b-costes .block-body, .b-ingresos .block-body {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 3.5px;
+      align-content: start;
+    }
+    .item {
+      break-inside: avoid;
+      padding: 3px 5px;
+      border-radius: 5.5px;
+      gap: 1px;
+      box-shadow: none;
+      background: rgba(255, 255, 255, 0.88);
+    }
+    .item-title { font-size: 6.9pt; line-height: 1.15; }
+    .st-dot { font-size: 7pt; line-height: 1.15; }
+    .mini-dot { width: 4.5px; height: 4.5px; }
+    .item.dimmed { opacity: 1; }
+    .block.block-dim { opacity: 1; filter: none; }
+  }
+</style>
+</head>
+<body>
+<div id="root" class="app"></div>
+
+<div id="modal-backdrop" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <h3 id="modal-title">Editar tarjeta</h3>
+      <button class="btn" type="button" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="m-block">Bloque del Canvas</label>
+        <select id="m-block"></select>
+      </div>
+      <div class="field">
+        <label for="m-status">Nivel de determinación</label>
+        <select id="m-status"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="m-title">Título del aspecto</label>
+      <input id="m-title" type="text" placeholder="Ej.: Pasarela de cobro SEPA">
+    </div>
+    <div class="field">
+      <label for="m-desc">Descripción / qué implica</label>
+      <textarea id="m-desc" rows="3" placeholder="Resume qué hace o qué falta validar..."></textarea>
+    </div>
+    <div class="field">
+      <label for="m-note">Evidencia, criterio o próximo paso de validación</label>
+      <textarea id="m-note" rows="2" placeholder="Ej.: Entrevistar a 5 presidentes tras Junta Ordinaria..."></textarea>
+    </div>
+    <div class="field">
+      <label>Hilos de correlación asociados</label>
+      <div id="m-corrs" class="corr-checks"></div>
+    </div>
+    <div class="modal-foot">
+      <button id="m-delete" class="btn danger" type="button" onclick="deleteModalItem()">Eliminar tarjeta</button>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button class="btn" type="button" onclick="closeModal()">Cancelar</button>
+        <button class="btn primary" type="button" onclick="saveModalItem()">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="pricing.js"></script>
+<script>
+const STORAGE_KEY = "vecinda_bmc_v4";
+
+const BLOCKS = [
+  { id: "socios",      cls: "b-socios",      zone: "top",    color: "#FCD25A", title: "SOCIOS CLAVE" },
+  { id: "actividades", cls: "b-actividades", zone: "top",    color: "#FBE5DE", title: "ACTIVIDADES CLAVE" },
+  { id: "recursos",    cls: "b-recursos",    zone: "top",    color: "#B5E2D1", title: "RECURSOS CLAVE" },
+  { id: "propuesta",   cls: "b-propuesta",   zone: "top",    color: "#8DCBF5", title: "PROPUESTA DE VALOR" },
+  { id: "relaciones",  cls: "b-relaciones",  zone: "top",    color: "#E5C29F", title: "RELACIÓN CLIENTES" },
+  { id: "canales",     cls: "b-canales",     zone: "top",    color: "#FAA6C7", title: "CANALES" },
+  { id: "segmentos",   cls: "b-segmentos",   zone: "top",    color: "#DCF2B0", title: "SEGMENTO CLIENTES" },
+  { id: "costes",      cls: "b-costes",      zone: "bottom", color: "#F47D92", title: "COSTES DE ESTRUCTURA" },
+  { id: "ingresos",    cls: "b-ingresos",    zone: "bottom", color: "#FEEA9F", title: "FUENTES DE INGRESO" },
+];
+
+const STATUS_META = {
+  definido:      { label: "Determinado",           short: "Determinado",   emoji: "🟢", cls: "st-definido",      weight: 1.0 },
+  hipotesis:     { label: "Hipótesis por validar", short: "Hipótesis",     emoji: "🟡", cls: "st-hipotesis",     weight: 0.5 },
+  indeterminado: { label: "Indeterminado",         short: "Indeterminado", emoji: "🔴", cls: "st-indeterminado", weight: 0.0 },
+};
+
+const CORRELATIONS = [
+  {
+    id: "gestorias",
+    name: "Motor SaaS B2B · Gestorías (Licencia + Seats + Carteras)",
+    short: "SaaS Gestorías",
+    color: "#2563eb",
+    summary: "Las gestorías/administradores son el cliente pagador principal: pagan licencia base + cada perfil usuario de la gestora + extra decreciente por comunidad.",
+    dependency: "Vender a una gestoría incorpora decenas de comunidades de golpe, con facturación B2B estable y ahorro directo de horas administrativas.",
+    tension: "Falta fijar las cifras exactas de licencia base, precio por asiento gestor y tramos de descuento al por mayor por volumen de fincas."
+  },
+  {
+    id: "permisos",
+    name: "Jerarquía de permisos y coste mínimo (~5 activos vs. vecinos)",
+    short: "Permisos ~5 activos",
+    color: "#0f766e",
+    summary: "Solo ~5 cuentas por finca modifican datos (3 de gestoría + 1 presidente + 1 conserje); propietarios e inquilinos solo navegan y consultan.",
+    dependency: "Al limitar la escritura a perfiles operativos y dejar a los vecinos como solo lectura/consulta, los costes de infraestructura y soporte son mínimos.",
+    tension: "Validar con gestorías y conserjes reales el reparto exacto de permisos entre los 3 perfiles gestores, presidencia y portería."
+  },
+  {
+    id: "autogestion",
+    name: "Comunidades autogestionadas (Pricing especial)",
+    short: "Autogestionadas",
+    color: "#0891b2",
+    summary: "Las comunidades sin gestoría mantienen cabida mediante un pricing especial donde el presidente asume la gestión operativa.",
+    dependency: "Evita dejar fuera al mercado de fincas autogestionadas y aprovecha la transparencia contable como gancho.",
+    tension: "Pendiente validar si el pricing especial cubre soporte directo al presidente sin disparar costes frente al canal de gestorías."
+  },
+  {
+    id: "colateral",
+    name: "Ingreso colateral de usuarios planos (Pay-as-you-go / Suscripción)",
+    short: "Colateral vecinos",
+    color: "#7c3aed",
+    summary: "Propietarios e inquilinos entran gratis con coste casi nulo, generando una base productiva monetizable por uso puntual o suscripción.",
+    dependency: "Cuantas más fincas traen las gestorías, mayor es la masa crítica de usuarios planos sin coste de captación (CAC).",
+    tension: "Falta concretar qué servicios o capacidades adicionales justifican que un vecino pague Pay-as-you-go o suscripción propia."
+  },
+  {
+    id: "marketplace",
+    name: "Marketplace por gremios vacantes (0 € si ya hay contrato)",
+    short: "Marketplace gremios",
+    color: "#d97706",
+    summary: "Si una comunidad ya tiene un gremio contratado (ej. fontanería), ese proveedor está gratis y no entran competidores; solo se anuncian negocios en gremios libres (ej. carpintería).",
+    dependency: "Respeta los contratos vigentes de la gestoría/finca y cobra a negocios nuevos por cantidad de anuncios y comunidades alcanzadas.",
+    tension: "Falta definir los planes de suscripción para anunciantes (por nº de anuncios y comunidades) y el control de calidad de gremios."
+  },
+  {
+    id: "legal",
+    name: "Hub operativo: contratos de la gestora",
+    short: "Hub / Contratos gestora",
+    color: "#475569",
+    summary: "Los contratos y el marco legal son de la gestoría; Vecinda provee el hub operativo para que los usen y gestionen con sus comunidades.",
+    dependency: "Reduce drásticamente la carga jurídica de Vecinda, que actúa como herramienta/hub y no como despacho legal.",
+    tension: "Solo queda definir la privacidad estándar de la plataforma (RGPD básico del hub) y los documentos propios de autogestionadas."
+  },
+];
+
+const eurP = n => Number(n).toLocaleString("es-ES", { style: "currency", currency: "EUR", minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+function buildDynamicPricingTexts() {
+  const s = VECINDA_CONFIG.suscripcion;
+  const [lo, hi] = s.rangoObjetivo;
+  const rLo = resumenPrecio(lo, "mensual");
+  const rMid = resumenPrecio(Math.round((lo + hi) / 2), "mensual");
+  const rHi = resumenPrecio(hi, "mensual");
+  const rLoAnual = resumenPrecio(lo, "anual");
+  const descPct = Math.round((s.mesesGratisAnual / 12) * 1000) / 10;
+
+  const saasDesc =
+    `${eurP(s.cuotaBaseMensual)}/mes hasta ${s.viviendasIncluidas} viv. + ${eurP(s.extraPorVivienda)}/mes por viv. extra. ` +
+    `Ej.: ${lo} viv. → ${eurP(rLo.mensual)}/mes (${eurP(rLo.porVivienda)}/viv.); ` +
+    `${rMid.viviendas} viv. → ${eurP(rMid.mensual)}/mes (${eurP(rMid.porVivienda)}/viv.); ` +
+    `${hi} viv. → ${eurP(rHi.mensual)}/mes (${eurP(rHi.porVivienda)}/viv.). ` +
+    `Anual: ${s.mesesGratisAnual} meses gratis (~${descPct}% dto., desde ${eurP(rLoAnual.totalPeriodo)}/año).`;
+
+  const serviciosText = VECINDA_CONFIG.servicios
+    .map(sv => `${sv.icono} ${sv.nombre}: ${eurP(sv.precio)} (${sv.unidad})`)
+    .join(" · ");
+
+  const m = VECINDA_CONFIG.marketplace;
+  const cMin = Math.round(m.comisionObraCerrada[0] * 100);
+  const cMax = Math.round(m.comisionObraCerrada[1] * 100);
+
+  return {
+    rangoObjetivoLabel: `${lo}–${hi} viviendas`,
+    saasDesc,
+    serviciosText,
+    marketplaceDesc: `Gratis para la comunidad (${eurP(m.costeParaComunidad)}): ${m.presupuestosPorSolicitud} presupuestos por incidencia. Monetización en meses 5–6 vía pay-per-lead o comisión del ${cMin}%–${cMax}% sobre obra cerrada.`,
+    presupuestosCount: m.presupuestosPorSolicitud,
+    nota: VECINDA_CONFIG.notaValidacion,
+  };
+}
+
+function buildSeedItems() {
+  const p = buildDynamicPricingTexts();
+  return [
+    // Socios Clave
+    {
+      id: "soc-1", block: "socios", status: "definido",
+      title: "Proveedores ya contratados por la finca (0 €)",
+      desc: "Empresas con contrato vigente (ej. fontanería) integradas sin coste en su comunidad para atender averías y mantenimiento.",
+      note: "No pagan por estar en clientes ya adquiridos ni compiten con otros anunciantes en esa categoría.",
+      corrs: ["marketplace"]
+    },
+    {
+      id: "soc-2", block: "socios", status: "hipotesis",
+      title: "Negocios anunciantes para gremios libres",
+      desc: "Empresas locales (ej. carpintería) que se anuncian en comunidades donde ese gremio no está cubierto.",
+      note: "Pendiente definir criterios de homologación y planes por nº de anuncios y comunidades.",
+      corrs: ["marketplace"]
+    },
+    {
+      id: "soc-3", block: "socios", status: "definido",
+      title: "Gestoría aporta sus propios contratos y marco legal",
+      desc: "Los contratos, estatutos y responsabilidad jurídica pertenecen a la gestora; Vecinda ofrece el hub donde los operan.",
+      note: "Evita que Vecinda asuma asesoría o responsabilidad contractual directa con cada comunidad.",
+      corrs: ["legal", "gestorias"]
+    },
+    {
+      id: "soc-4", block: "socios", status: "hipotesis",
+      title: "Pasarela de cobro para usuarios independientes",
+      desc: "Estudiar Stripe, PayPal u otra pasarela que permita cobrar como usuario independiente sin constituir empresa inicialmente.",
+      note: "Decisión técnica aplazada: no bloquea la propuesta de valor del Canvas.",
+      corrs: ["gestorias", "colateral", "marketplace"]
+    },
+
+    // Actividades Clave
+    {
+      id: "act-1", block: "actividades", status: "definido",
+      title: "Gestión jerárquica de permisos (~5 activos/finca)",
+      desc: "Operativa centralizada en ~3 perfiles de gestoría, 1 presidente y 1 conserje; vecinos limitados a navegación y consulta.",
+      note: "Evita conflictos de edición y reduce al mínimo la carga operativa.",
+      corrs: ["permisos", "gestorias"]
+    },
+    {
+      id: "act-2", block: "actividades", status: "definido",
+      title: "Trámites diarios: cuentas, avisos, incidencias y traspasos",
+      desc: "Publicación de cuentas claras, comunicados, seguimiento de averías, códigos de inquilino y certificados de deuda.",
+      note: "Núcleo de ahorro de tiempo para la gestoría y transparencia para la finca.",
+      corrs: ["gestorias", "permisos", "legal"]
+    },
+    {
+      id: "act-3", block: "actividades", status: "hipotesis",
+      title: "Gestión de exclusividad y huecos en Marketplace",
+      desc: "Bloquear competidores donde ya existe proveedor contratado y habilitar anuncios solo en gremios vacantes.",
+      note: "Requiere verificar qué gremios tiene contratados cada comunidad.",
+      corrs: ["marketplace"]
+    },
+    {
+      id: "act-4", block: "actividades", status: "hipotesis",
+      title: "Captación orgánica inicial de gestorías y anunciantes",
+      desc: "Incorporación directa sin inversión en publicidad, apoyada en la sencillez de la app y el boca-oreja.",
+      note: "Evita quemar presupuesto antes de validar las primeras carteras.",
+      corrs: ["gestorias", "marketplace"]
+    },
+
+    // Recursos Clave
+    {
+      id: "rec-1", block: "recursos", status: "definido",
+      title: "Arquitectura ligera por jerarquía de roles",
+      desc: "Separación estricta entre ~5 usuarios con escritura y decenas de usuarios planos de solo consulta/navegación.",
+      note: "Ventaja estructural que mantiene los costes de infraestructura casi nulos.",
+      corrs: ["permisos"]
+    },
+    {
+      id: "rec-2", block: "recursos", status: "definido",
+      title: "Base viva de fincas, contratos de gremios y censo",
+      desc: "Historial de titulares, deudas, inquilinos, averías y mapa de qué gremios están cubiertos o libres en cada finca.",
+      note: "Activo clave tanto para la gestoría como para segmentar anuncios en el marketplace.",
+      corrs: ["gestorias", "marketplace", "legal"]
+    },
+    {
+      id: "rec-3", block: "recursos", status: "definido",
+      title: "Web app en Vercel / Netlify para operar el hub",
+      desc: "Despliegue sencillo y escalable sin infraestructura compleja, suficiente para lanzar y operar con comunidades reales.",
+      note: "Permite arrancar en capa gratuita y escalar solo con uso de pago.",
+      corrs: ["gestorias", "permisos", "legal"]
+    },
+    {
+      id: "rec-4", block: "recursos", status: "definido",
+      title: "Hub documental operado con contratos de la gestora",
+      desc: "Espacio donde cada gestoría carga y usa sus propios contratos, actas y certificados con sus comunidades.",
+      note: "Solo queda cubrir la política básica de privacidad del hub (RGPD).",
+      corrs: ["legal", "gestorias"]
+    },
+
+    // Propuesta de Valor
+    {
+      id: "pro-1", block: "propuesta", status: "definido",
+      title: "Centralización de trámites para gestorías sin sobrecoste de vecinos",
+      desc: "La gestoría opera múltiples fincas desde un panel único mientras los vecinos consultan gratis sin generar soporte ni gasto.",
+      note: "Reduce llamadas repetitivas de vecinos preguntando por cuentas o averías.",
+      corrs: ["gestorias", "permisos"]
+    },
+    {
+      id: "pro-2", block: "propuesta", status: "definido",
+      title: "Cuentas claras, avisos oficiales e incidencias trazables",
+      desc: "Transparencia en tiempo real para toda la comunidad sin ruido de chats ni papeles en el portal.",
+      note: "Fideliza a la comunidad con su gestoría o facilita la autogestión.",
+      corrs: ["permisos", "autogestion"]
+    },
+    {
+      id: "pro-3", block: "propuesta", status: "definido",
+      title: "Marketplace respetuoso: cero intrusión en contratos vigentes",
+      desc: "Si ya hay fontanería contratada, no paga ni entran competidores; solo se cubren gremios vacantes (ej. carpintería).",
+      note: "Elimina la fricción y el conflicto de interés percibido.",
+      corrs: ["marketplace"]
+    },
+    {
+      id: "pro-4", block: "propuesta", status: "hipotesis",
+      title: "Servicios adicionales para vecinos (Pay-as-you-go / Suscripción)",
+      desc: "Valor añadido opcional para propietarios e inquilinos sin obligar a pagar por la navegación básica.",
+      note: "Por definir qué trámites o servicios concretos integran este paquete colateral.",
+      corrs: ["colateral"]
+    },
+    {
+      id: "pro-5", block: "propuesta", status: "hipotesis",
+      title: "Votaciones ágiles, Junta online y traspasos ordenados",
+      desc: "Gestión de inquilinos por código, certificado de deuda en compraventas y juntas con acta automática.",
+      note: "Pendiente validar coeficientes de propiedad y validez LPH.",
+      corrs: ["legal", "autogestion"]
+    },
+
+    // Relaciones con Clientes
+    {
+      id: "rel-1", block: "relaciones", status: "definido",
+      title: "Relación B2B directa con la gestoría + soporte a su equipo",
+      desc: "Atención centrada en los perfiles gestores de pago, no en atender incidencias de uso de cientos de vecinos.",
+      note: "Mantiene el coste de soporte acotado y predecible.",
+      corrs: ["gestorias", "permisos"]
+    },
+    {
+      id: "rel-2", block: "relaciones", status: "definido",
+      title: "Autoservicio de solo lectura/navegación para vecinos",
+      desc: "Los usuarios planos entran sin fricción y sin soporte manual para consultar cuentas, avisos y reportar averías.",
+      note: "Coste operativo cercano a cero por usuario plano.",
+      corrs: ["permisos", "colateral"]
+    },
+    {
+      id: "rel-3", block: "relaciones", status: "definido",
+      title: "Protección al proveedor habitual de la comunidad",
+      desc: "Garantía de que las empresas con contrato vigente no pagan ni sufren competencia en su gremio dentro de esa finca.",
+      note: "Genera confianza para que las gestorías incorporen a sus proveedores habituales.",
+      corrs: ["marketplace"]
+    },
+    {
+      id: "rel-4", block: "relaciones", status: "hipotesis",
+      title: "Autoservicio para comunidades autogestionadas",
+      desc: "Flujo sencillo para que un presidente sin gestoría configure su finca con pricing especial.",
+      note: "Validar cuánto soporte requiere un presidente no profesional.",
+      corrs: ["autogestion"]
+    },
+
+    // Canales
+    {
+      id: "can-1", block: "canales", status: "hipotesis",
+      title: "Captación orgánica B2B hacia gestorías",
+      desc: "Contacto directo y recomendación orgánica para incorporar despachos con su cartera completa sin inversión publicitaria inicial.",
+      note: "El atractivo es la simplicidad de uso inmediata.",
+      corrs: ["gestorias"]
+    },
+    {
+      id: "can-2", block: "canales", status: "definido",
+      title: "Despliegue en cascada hacia la comunidad",
+      desc: "La gestoría (o presidente) da acceso por código/invitación a los vecinos, que entran como usuarios planos sin CAC.",
+      note: "Alimenta gratis la base para ingreso colateral y marketplace.",
+      corrs: ["permisos", "colateral"]
+    },
+    {
+      id: "can-3", block: "canales", status: "hipotesis",
+      title: "Portal de anunciantes para negocios locales",
+      desc: "Canal de autogestión donde empresas eligen gremios vacantes, número de anuncios y comunidades objetivo.",
+      note: "Por validar captación de gremios por zonas.",
+      corrs: ["marketplace"]
+    },
+    {
+      id: "can-4", block: "canales", status: "hipotesis",
+      title: "Captación orgánica de fincas autogestionadas (0 € CAC)",
+      desc: "Entrada natural por recomendación entre vecinos y presidentes gracias a la sencillez de la plataforma, sin gasto en anuncios.",
+      note: "No requiere invertir dinero de golpe para atraer este segmento.",
+      corrs: ["autogestion"]
+    },
+
+    // Segmentos de Clientes
+    {
+      id: "seg-1", block: "segmentos", status: "definido",
+      title: "Gestorías y Administradores de Fincas (Cliente principal)",
+      desc: "Decisor y pagador B2B (~3 perfiles gestores por finca); llevan los trámites de múltiples comunidades.",
+      note: "Eje central de ingresos recurrentes.",
+      corrs: ["gestorias", "permisos"]
+    },
+    {
+      id: "seg-2", block: "segmentos", status: "definido",
+      title: `Comunidades autogestionadas (${p.rangoObjetivoLabel})`,
+      desc: "Fincas sin gestoría donde el presidente asume la gestión con un pricing especial.",
+      note: "Segmento secundario con tarifa diferenciada.",
+      corrs: ["autogestion", "permisos"]
+    },
+    {
+      id: "seg-3", block: "segmentos", status: "definido",
+      title: "Usuarios planos: Propietarios e Inquilinos",
+      desc: "Navegan y consultan gratis sin permisos de modificación; fuente de ingreso colateral opcional.",
+      note: "Presidente y conserje actúan como enlaces operativos locales (~2 cuentas).",
+      corrs: ["permisos", "colateral"]
+    },
+    {
+      id: "seg-4", block: "segmentos", status: "hipotesis",
+      title: "Conserjes / portería",
+      desc: "1 perfil operativo por finca para gestionar avisos e incidencias diarias sin ver cuentas ni votar.",
+      note: "Pendiente validar directamente con conserjes reales.",
+      corrs: ["permisos"]
+    },
+    {
+      id: "seg-5", block: "segmentos", status: "hipotesis",
+      title: "Negocios locales y gremios anunciantes",
+      desc: "Empresas que pagan por anunciarse en gremios vacantes de comunidades nuevas (0 € si ya tienen contrato).",
+      note: "Pendiente validar precios por nº de anuncios y alcance de comunidades.",
+      corrs: ["marketplace"]
+    },
+
+    // Estructura de Costes
+    {
+      id: "cos-1", block: "costes", status: "definido",
+      title: "Costes de despliegue retroalimentativos (Vercel / Netlify)",
+      desc: "El consumo de servidor solo crece con permisos de modificación, exclusivos de suscripciones o Pay-as-you-go: no sube sin ingresos.",
+      note: "Los usuarios planos de solo lectura no disparan la carga ni la factura.",
+      corrs: ["permisos", "colateral"]
+    },
+    {
+      id: "cos-2", block: "costes", status: "definido",
+      title: "Desarrollo propio / hobby (sin coste salarial directo)",
+      desc: "Construcción y evolución de la web app por el equipo propio sin estructura pesada ni nóminas iniciales.",
+      note: "Mantiene la inversión inicial en desarrollo prácticamente en cero.",
+      corrs: ["gestorias", "permisos"]
+    },
+    {
+      id: "cos-3", block: "costes", status: "definido",
+      title: "Sin estructura legal pesada (contratos a cargo de la gestora)",
+      desc: "Al actuar solo como hub operativo, Vecinda no asume redacción ni responsabilidad jurídica de los contratos de las fincas.",
+      note: "Mantiene los costes legales y de cumplimiento acotados al funcionamiento estándar del hub.",
+      corrs: ["legal"]
+    },
+    {
+      id: "cos-4", block: "costes", status: "definido",
+      title: "Captación orgánica (CAC ≈ 0 €) y comisiones solo al cobrar",
+      desc: "Sin inversión en marketing pagado al inicio; los únicos costes variables (pasarela de pago) aparecen cuando ya hay ingresos.",
+      note: "Alineado con despliegue sencillo y soporte acotado a cuentas gestoras.",
+      corrs: ["gestorias", "marketplace", "autogestion"]
+    },
+
+    // Fuentes de Ingresos
+    {
+      id: "ing-1", block: "ingresos", status: "hipotesis",
+      title: "1. Suscripción Gestorías: Licencia + Seats + Comunidades",
+      desc: "Licencia base del despacho + pago por cada usuario gestor activo + extra por comunidad con descuento al por mayor.",
+      note: "Falta fijar tarifas exactas por licencia, asiento y tramos de volumen.",
+      corrs: ["gestorias"]
+    },
+    {
+      id: "ing-2", block: "ingresos", status: "hipotesis",
+      title: "2. Pricing especial · Comunidades autogestionadas",
+      desc: `Tarifa orientativa para fincas sin gestoría: ${p.saasDesc} + servicios puntuales (${p.serviciosText}).`,
+      note: `${p.nota} Referencia orientativa para fincas sin administrador externo.`,
+      corrs: ["autogestion", "legal"]
+    },
+    {
+      id: "ing-3", block: "ingresos", status: "hipotesis",
+      title: "3. Ingreso colateral de usuarios planos",
+      desc: "Propietarios e inquilinos gratis en navegación básica; monetización opcional Pay-as-you-go o suscripción propia.",
+      note: "Sin coste de captación ni sobrecoste de infraestructura; catálogo por definir.",
+      corrs: ["colateral"]
+    },
+    {
+      id: "ing-4", block: "ingresos", status: "hipotesis",
+      title: "4. Marketplace: suscripción por anuncios y comunidades",
+      desc: "Los negocios pagan según cantidad de anuncios y número de comunidades alcanzadas, solo en gremios libres (0 € si ya hay contrato).",
+      note: "Exclusividad inicial por gremio contratado (ej. fontanería cubierto, carpintería abierta).",
+      corrs: ["marketplace"]
+    },
+    {
+      id: "ing-5", block: "ingresos", status: "hipotesis",
+      title: "Cifras exactas de pricing y pasarela de cobro",
+      desc: "Los importes concretos están por determinar; la pasarela (Stripe, PayPal o similar para cobro independiente) se definirá al implementar.",
+      note: "La estructura de las 4 vías de ingreso ya está definida; los números exactos no son críticos en esta fase.",
+      corrs: ["gestorias", "marketplace"]
+    },
+  ];
+}
+
+let state = null;
+let editingId = null;
+
+function createInitialState() {
+  const [lo, hi] = VECINDA_CONFIG.suscripcion.rangoObjetivo;
+  return {
+    items: buildSeedItems(),
+    filterStatus: "todos",
+    activeCorr: null,
+    showLines: true,
+    compact: true,
+    search: "",
+    sim: {
+      comunidades: 25,
+      viviendas: Math.round((lo + hi) / 2),
+      pctAnual: 40,
+      addonsAnio: 35,
+    },
+  };
+}
+
+function loadState() {
+  const fresh = createInitialState();
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return fresh;
+    const saved = JSON.parse(raw);
+    if (!saved || !Array.isArray(saved.items)) return fresh;
+    const validBlocks = new Set(BLOCKS.map(b => b.id));
+    const validCorrs = new Set(CORRELATIONS.map(c => c.id));
+    const items = saved.items
+      .filter(it => it && validBlocks.has(it.block) && STATUS_META[it.status])
+      .map(it => ({
+        id: String(it.id || ("it-" + Math.random().toString(36).slice(2, 8))),
+        block: it.block,
+        status: it.status,
+        title: String(it.title || "Sin título"),
+        desc: String(it.desc || ""),
+        note: String(it.note || ""),
+        corrs: Array.isArray(it.corrs) ? it.corrs.filter(c => validCorrs.has(c)) : [],
+      }));
+    return {
+      ...fresh,
+      items: items.length ? items : fresh.items,
+      filterStatus: STATUS_META[saved.filterStatus] || saved.filterStatus === "todos" ? saved.filterStatus : "todos",
+      activeCorr: validCorrs.has(saved.activeCorr) ? saved.activeCorr : null,
+      showLines: typeof saved.showLines === "boolean" ? saved.showLines : true,
+      compact: typeof saved.compact === "boolean" ? saved.compact : true,
+      search: String(saved.search || ""),
+      sim: { ...fresh.sim, ...(saved.sim || {}) },
+    };
+  } catch (e) {
+    return fresh;
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {}
+}
+
+const esc = s => String(s)
+  .replace(/&/g, "&amp;")
+  .replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;")
+  .replace(/"/g, "&quot;");
+
+function computeStats(items) {
+  const total = items.length || 1;
+  let definido = 0, hipotesis = 0, indeterminado = 0, score = 0;
+  for (const it of items) {
+    if (it.status === "definido") definido++;
+    else if (it.status === "hipotesis") hipotesis++;
+    else indeterminado++;
+    score += STATUS_META[it.status].weight;
+  }
+  return {
+    count: items.length,
+    definido,
+    hipotesis,
+    indeterminado,
+    pctDef: Math.round((definido / total) * 100),
+    pctHip: Math.round((hipotesis / total) * 100),
+    pctInd: Math.round((indeterminado / total) * 100),
+    madurez: items.length ? Math.round((score / items.length) * 100) : 0,
+  };
+}
+
+function getCorr(id) {
+  return CORRELATIONS.find(c => c.id === id) || null;
+}
+
+function matchesFilter(item) {
+  if (state.filterStatus !== "todos" && item.status !== state.filterStatus) return false;
+  if (state.search.trim()) {
+    const q = state.search.trim().toLowerCase();
+    const hay = `${item.title} ${item.desc} ${item.note}`.toLowerCase();
+    if (!hay.includes(q)) return false;
+  }
+  return true;
+}
+
+function renderToolbar() {
+  const statusChips = [
+    { id: "todos", label: "Todos" },
+    { id: "definido", label: "🟢 Determinados" },
+    { id: "hipotesis", label: "🟡 Hipótesis" },
+    { id: "indeterminado", label: "🔴 Indeterminados" },
+  ];
+
+  return `
+    <header class="toolbar">
+      <div class="toolbar-row">
+        <div class="tool-group">
+          <a class="btn soft" href="vecinda.html">📱 Prototipo</a>
+          <span class="group-label" style="margin-left:4px">Determinación:</span>
+          ${statusChips.map(c => `
+            <button type="button" class="chip ${state.filterStatus === c.id ? "active" : ""}" onclick="setFilterStatus('${c.id}')">${c.label}</button>
+          `).join("")}
+        </div>
+        <div class="tool-group">
+          <input class="search-input" type="search" value="${esc(state.search)}" placeholder="Buscar concepto, LPH, SEPA..." oninput="setSearch(this.value)">
+          <button type="button" class="btn ${state.compact ? "" : "active-toggle"}" onclick="toggleCompact()">${state.compact ? "☰ Vista detallada" : "◫ Vista compacta"}</button>
+          <button class="btn primary" type="button" onclick="openModal(null)">+ Añadir</button>
+          <button class="btn" type="button" onclick="exportJSON()">⬇️ JSON</button>
+          <button class="btn" type="button" onclick="window.print()">🖨️ PDF</button>
+          <button class="btn" type="button" onclick="resetCanvas()">↺ Restaurar</button>
+        </div>
+      </div>
+      <div class="toolbar-row">
+        <div class="tool-group">
+          <span class="group-label">Correlaciones:</span>
+          <button type="button" class="chip ${state.activeCorr === null ? "active" : ""}" onclick="toggleCorr(null)">Sin resaltar</button>
+          ${CORRELATIONS.map(c => `
+            <button type="button" class="chip corr-chip ${state.activeCorr === c.id ? "active" : ""}" style="--corr-color:${c.color}" onclick="toggleCorr('${c.id}')">
+              <span class="dot" style="background:${state.activeCorr === c.id ? "#fff" : c.color}"></span>
+              ${esc(c.short)}
+            </button>
+          `).join("")}
+        </div>
+        <label class="toggle-label">
+          <input type="checkbox" ${state.showLines ? "checked" : ""} onchange="toggleLines(this.checked)">
+          Líneas SVG
+        </label>
+      </div>
+    </header>
+  `;
+}
+
+function renderCorrInsight() {
+  const corr = getCorr(state.activeCorr);
+  if (!corr) return "";
+  const linked = state.items.filter(it => it.corrs.includes(corr.id));
+  const st = computeStats(linked);
+  const blockNames = [...new Set(linked.map(it => BLOCKS.find(b => b.id === it.block)?.title).filter(Boolean))];
+  return `
+    <section class="corr-insight" style="--corr-color:${corr.color}">
+      <div>
+        <h2><span class="dot" style="width:11px;height:11px;background:${corr.color}"></span>${esc(corr.name)}</h2>
+        <p>${esc(corr.summary)}</p>
+        <div style="margin-top:6px;font-size:11.5px;color:var(--ink)">
+          <strong>${linked.length} tarjetas</strong> en ${blockNames.length} bloques (${esc(blockNames.join(", "))}) · Madurez del hilo: <strong>${st.madurez}%</strong>
+        </div>
+      </div>
+      <div class="insight-box">
+        <strong>Correlación / Dependencia</strong>
+        ${esc(corr.dependency)}
+      </div>
+      <div class="insight-box" style="border-color:var(--warn-bd);background:#fffbeb">
+        <strong style="color:var(--warn)">Tensión / Qué falta determinar</strong>
+        ${esc(corr.tension)}
+      </div>
+    </section>
+  `;
+}
+
+function renderItemCard(item) {
+  const st = STATUS_META[item.status];
+  const activeCorr = getCorr(state.activeCorr);
+  const isInActive = activeCorr ? item.corrs.includes(activeCorr.id) : false;
+  const clsExtra = activeCorr ? (isInActive ? "highlighted" : "dimmed") : "";
+  const styleExtra = isInActive ? `--corr-color:${activeCorr.color}` : "";
+  const showDesc = !state.compact || item.block === "ingresos";
+
+  return `
+    <article class="item ${clsExtra}" style="${styleExtra}" title="${esc(st.label + (item.desc ? " · " + item.desc : ""))}" data-item-id="${esc(item.id)}" data-block="${esc(item.block)}" data-corr-hit="${isInActive ? "1" : "0"}" onclick="openModal('${esc(item.id)}')">
+      <div class="item-row-top">
+        <div class="item-title-wrap">
+          <span class="st-dot" title="${esc(st.label)}">${st.emoji}</span>
+          <span class="item-title">${esc(item.title)}</span>
+        </div>
+        ${state.compact && item.corrs.length ? `
+          <div class="item-corr-dots">
+            ${item.corrs.map(cid => {
+              const c = getCorr(cid);
+              return c ? `<span class="mini-dot" title="${esc(c.short)}" style="background:${c.color}"></span>` : "";
+            }).join("")}
+          </div>
+        ` : ""}
+      </div>
+      ${showDesc && item.desc ? `<div class="item-desc">${esc(item.desc)}</div>` : ""}
+      ${!state.compact && item.corrs.length ? `
+        <div class="item-corrs">
+          ${item.corrs.map(cid => {
+            const c = getCorr(cid);
+            return c ? `<span class="corr-pill" style="color:${c.color}">${esc(c.short)}</span>` : "";
+          }).join("")}
+        </div>
+      ` : ""}
+    </article>
+  `;
+}
+
+function renderBlock(b) {
+  const activeCorr = getCorr(state.activeCorr);
+  const allInBlock = state.items.filter(it => it.block === b.id);
+  const visible = allInBlock.filter(matchesFilter);
+  const st = computeStats(allInBlock);
+  const hasCorrHit = activeCorr ? visible.some(it => it.corrs.includes(activeCorr.id)) : false;
+  const blockCls = activeCorr ? (hasCorrHit ? "block-lit" : "block-dim") : "";
+  const blockStyle = activeCorr && hasCorrHit ? `--corr-color:${activeCorr.color}` : "";
+
+  return `
+    <div class="block ${b.cls} ${blockCls}" style="${blockStyle}" data-block-id="${b.id}">
+      <div class="block-head">
+        <h2 class="block-title">${esc(b.title)}</h2>
+        <button class="block-add" type="button" title="Añadir tarjeta en ${esc(b.title)}" onclick="openModal(null, '${b.id}')">+</button>
+        <div class="block-meta-row">
+          <div class="block-bar" title="${st.definido} determinados · ${st.hipotesis} hipótesis · ${st.indeterminado} indeterminados">
+            <span class="seg-def" style="width:${st.pctDef}%"></span>
+            <span class="seg-hip" style="width:${st.pctHip}%"></span>
+            <span class="seg-ind" style="width:${st.pctInd}%"></span>
+          </div>
+          <span class="block-count">${visible.length}${visible.length !== allInBlock.length ? "/" + allInBlock.length : ""} · ${st.madurez}%</span>
+        </div>
+      </div>
+      <div class="block-body">
+        ${visible.length ? visible.map(renderItemCard).join("") : `<div class="empty-block">Sin tarjetas con el filtro actual</div>`}
+      </div>
+    </div>
+  `;
+}
+
+function renderCanvasSheet(stats) {
+  const topBlocks = BLOCKS.filter(b => b.zone === "top");
+  const bottomBlocks = BLOCKS.filter(b => b.zone === "bottom");
+
+  return `
+    <main class="bmc-sheet">
+      <div class="sheet-header">
+        <div class="sheet-title-wrap">
+          <h1 class="sheet-title">Bussiness model canva Vecinda</h1>
+          <div class="sheet-sub">
+            <span><strong>Vecinda</strong> · Gestión transparente de comunidades de propietarios</span>
+            <span class="mini-seg" title="${stats.pctDef}% determinado · ${stats.pctHip}% hipótesis · ${stats.pctInd}% indeterminado">
+              <span class="seg-def" style="width:${stats.pctDef}%"></span>
+              <span class="seg-hip" style="width:${stats.pctHip}%"></span>
+              <span class="seg-ind" style="width:${stats.pctInd}%"></span>
+            </span>
+            <span><strong>${stats.madurez}% madurez</strong> (${stats.count} aspectos)</span>
+          </div>
+        </div>
+      </div>
+
+      <section class="canvas-stage" id="canvas-stage">
+        <svg class="corr-svg" id="corr-svg" aria-hidden="true"></svg>
+        <div class="bmc-board">
+          <div class="bmc-top">
+            ${topBlocks.map(renderBlock).join("")}
+          </div>
+          <div class="bmc-bottom">
+            ${bottomBlocks.map(renderBlock).join("")}
+          </div>
+        </div>
+      </section>
+    </main>
+  `;
+}
+
+function renderKpiStrip(stats) {
+  return `
+    <section class="kpi-strip">
+      <div class="kpi-card">
+        <div class="kpi-label">Aspectos mapeados</div>
+        <div class="kpi-value">${stats.count} <small>en 9 bloques</small></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">🟢 Determinados</div>
+        <div class="kpi-value" style="color:var(--ok)">${stats.definido} <small>${stats.pctDef}%</small></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">🟡 Hipótesis</div>
+        <div class="kpi-value" style="color:var(--warn)">${stats.hipotesis} <small>${stats.pctHip}%</small></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">🔴 Indeterminados</div>
+        <div class="kpi-value" style="color:var(--bad)">${stats.indeterminado} <small>${stats.pctInd}%</small></div>
+      </div>
+      <div class="kpi-progress">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+          <span style="font-weight:700">Índice de definición del modelo</span>
+          <strong style="color:var(--brand-d)">${stats.madurez}% madurez ponderada</strong>
+        </div>
+        <div class="seg-bar" aria-label="Distribución de determinación">
+          <span class="seg-def" style="width:${stats.pctDef}%"></span>
+          <span class="seg-hip" style="width:${stats.pctHip}%"></span>
+          <span class="seg-ind" style="width:${stats.pctInd}%"></span>
+        </div>
+        <div style="font-size:11px;color:var(--muted)">
+          Determinado = 100% · Hipótesis = 50% · Indeterminado = 0% · ${esc(VECINDA_CONFIG.notaValidacion)}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderMaturityPanel() {
+  const rows = BLOCKS.map(b => {
+    const items = state.items.filter(it => it.block === b.id);
+    return { block: b, stats: computeStats(items) };
+  }).sort((a, b) => a.stats.madurez - b.stats.madurez);
+
+  return `
+    <section class="panel">
+      <h2>📊 Madurez por bloque</h2>
+      <p class="panel-sub">Ordenado de menor a mayor definición para detectar rápido los puntos ciegos.</p>
+      <div class="maturity-list">
+        ${rows.map(({ block, stats }) => `
+          <div class="mat-row">
+            <div class="mat-name"><span class="mat-swatch" style="background:${block.color}"></span>${esc(block.title)}</div>
+            <div class="mat-bar">
+              <span class="seg-def" style="width:${stats.pctDef}%"></span>
+              <span class="seg-hip" style="width:${stats.pctHip}%"></span>
+              <span class="seg-ind" style="width:${stats.pctInd}%"></span>
+            </div>
+            <div class="mat-pct">${stats.madurez}% (${stats.count})</div>
+          </div>
+        `).join("")}
+      </div>
+      <div style="font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px">
+        Lectura rápida: la jerarquía de permisos y el enfoque B2B hacia gestorías consolidan <strong>PROPUESTA DE VALOR</strong> y <strong>SEGMENTO CLIENTES</strong>; falta cerrar las tarifas definitivas de gestorías/marketplace y el encaje legal LPH.
+      </div>
+    </section>
+  `;
+}
+
+function computeSimulatorOutput() {
+  const s = state.sim;
+  const rMes = resumenPrecio(s.viviendas, "mensual");
+  const rAnu = resumenPrecio(s.viviendas, "anual");
+  const frAnual = s.pctAnual / 100;
+  const frMes = 1 - frAnual;
+  const comunidadesMes = s.comunidades * frMes;
+  const comunidadesAnu = s.comunidades * frAnual;
+  const mrrSuscripcion = comunidadesMes * rMes.mensual + comunidadesAnu * rAnu.equivMensual;
+  const mrrAddons = (s.comunidades * s.addonsAnio) / 12;
+  const mrrTotal = mrrSuscripcion + mrrAddons;
+  const arrTotal = mrrTotal * 12;
+  const costeVecinoMes = rMes.porVivienda * frMes + rAnu.porVivienda * frAnual;
+  return { rMes, rAnu, mrrSuscripcion, mrrAddons, mrrTotal, arrTotal, costeVecinoMes };
+}
+
+function renderSimulatorPanel() {
+  const cfg = VECINDA_CONFIG.suscripcion;
+  const [lo, hi] = cfg.rangoObjetivo;
+  const sim = state.sim;
+  const out = computeSimulatorOutput();
+
+  return `
+    <section class="panel">
+      <h2>🧮 Simulador · Pricing especial autogestionadas</h2>
+      <p class="panel-sub">Referencia orientativa con <code>pricing.js</code> (${lo}–${hi} viviendas). Las tarifas de Gestorías (licencia + seats + volumen) y Marketplace están pendientes de definir.</p>
+      <div class="sim-controls">
+        <div class="sim-field">
+          <label><span>Comunidades de pago</span><strong id="sv-com">${sim.comunidades}</strong></label>
+          <input type="range" min="1" max="250" value="${sim.comunidades}" oninput="updateSim('comunidades', this.value)">
+        </div>
+        <div class="sim-field">
+          <label><span>Viviendas medias/finca</span><strong id="sv-viv">${sim.viviendas}</strong></label>
+          <input type="range" min="${cfg.minViviendas}" max="120" value="${sim.viviendas}" oninput="updateSim('viviendas', this.value)">
+        </div>
+        <div class="sim-field">
+          <label><span>% en pago anual</span><strong id="sv-anu">${sim.pctAnual}%</strong></label>
+          <input type="range" min="0" max="100" step="5" value="${sim.pctAnual}" oninput="updateSim('pctAnual', this.value)">
+        </div>
+        <div class="sim-field">
+          <label><span>Add-ons/finca/año (€)</span><strong id="sv-add">${eurP(sim.addonsAnio)}</strong></label>
+          <input type="range" min="0" max="200" step="5" value="${sim.addonsAnio}" oninput="updateSim('addonsAnio', this.value)">
+        </div>
+      </div>
+      <div class="sim-results" id="sim-results">
+        ${renderSimResultsHTML(out)}
+      </div>
+      <div class="hyp-note">
+        ⚠️ ${esc(VECINDA_CONFIG.notaValidacion)} Estima ingresos brutos por suscripción + servicios; no descuenta costes cloud, SEPA, burofax ni CAC ni suma el futuro marketplace de gremios.
+      </div>
+    </section>
+  `;
+}
+
+function renderSimResultsHTML(out) {
+  return `
+    <div class="sim-metric">
+      <span>Cuota finca (mensual / equiv. anual)</span>
+      <strong>${eurP(out.rMes.mensual)} <small style="font-size:12px;color:var(--muted)">/ ${eurP(out.rAnu.equivMensual)}</small></strong>
+    </div>
+    <div class="sim-metric">
+      <span>Coste equivalente por vecino</span>
+      <strong>${eurP(out.costeVecinoMes)}/mes</strong>
+    </div>
+    <div class="sim-metric">
+      <span>MRR estimado (Suscripción + Add-ons)</span>
+      <strong>${eurP(out.mrrTotal)}</strong>
+    </div>
+    <div class="sim-metric">
+      <span>ARR estimado</span>
+      <strong>${eurP(out.arrTotal)}</strong>
+    </div>
+  `;
+}
+
+function renderGapsPanel() {
+  const priorityRank = { indeterminado: 0, hipotesis: 1, definido: 2 };
+  const gaps = state.items
+    .filter(it => it.status !== "definido")
+    .sort((a, b) => priorityRank[a.status] - priorityRank[b.status]);
+
+  return `
+    <section class="panel">
+      <h2>🧭 Qué falta determinar (${gaps.length} frentes)</h2>
+      <p class="panel-sub">Haz clic en cualquier brecha para editarla o registrar evidencia de validación.</p>
+      <div class="gaps-list">
+        ${gaps.map(g => {
+          const st = STATUS_META[g.status];
+          const b = BLOCKS.find(x => x.id === g.block);
+          return `
+            <div class="gap-item" onclick="openModal('${esc(g.id)}')">
+              <div class="gap-top">
+                <span class="gap-block">${esc(b.title)}</span>
+                <span class="status-badge ${st.cls}">${st.emoji} ${st.short}</span>
+              </div>
+              <div style="font-size:12.5px;font-weight:700">${esc(g.title)}</div>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${esc(g.note || g.desc)}</div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function drawCorrelationLines() {
+  const svg = document.getElementById("corr-svg");
+  const stage = document.getElementById("canvas-stage");
+  if (!svg || !stage) return;
+
+  const corr = getCorr(state.activeCorr);
+  if (!corr || !state.showLines || window.innerWidth <= 700) {
+    svg.innerHTML = "";
+    return;
+  }
+
+  const stageRect = stage.getBoundingClientRect();
+  svg.setAttribute("viewBox", `0 0 ${Math.max(1, stageRect.width)} ${Math.max(1, stageRect.height)}`);
+
+  const blockAnchors = [];
+  for (const b of BLOCKS) {
+    const blockEl = stage.querySelector(`[data-block-id="${b.id}"]`);
+    if (!blockEl) continue;
+    const hitCards = [...blockEl.querySelectorAll('[data-corr-hit="1"]')];
+    if (!hitCards.length) continue;
+
+    let sx = 0, sy = 0;
+    for (const card of hitCards) {
+      const r = card.getBoundingClientRect();
+      sx += (r.left + r.width / 2) - stageRect.left;
+      sy += (r.top + r.height / 2) - stageRect.top;
+    }
+    blockAnchors.push({ id: b.id, x: sx / hitCards.length, y: sy / hitCards.length });
+  }
+
+  if (blockAnchors.length < 2) {
+    svg.innerHTML = "";
+    return;
+  }
+
+  const hub = blockAnchors.find(a => a.id === "propuesta") || blockAnchors[0];
+  let paths = "";
+  for (const pt of blockAnchors) {
+    if (pt === hub) continue;
+    const dx = (pt.x - hub.x) * 0.45;
+    const dy = (pt.y - hub.y) * 0.15;
+    const d = `M ${hub.x.toFixed(1)} ${hub.y.toFixed(1)} C ${(hub.x + dx).toFixed(1)} ${(hub.y - dy).toFixed(1)}, ${(pt.x - dx).toFixed(1)} ${(pt.y + dy).toFixed(1)}, ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`;
+    paths += `<path d="${d}" fill="none" stroke="${corr.color}" stroke-width="2.5" stroke-opacity="0.58" stroke-dasharray="6 4"/>`;
+    paths += `<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="4.5" fill="${corr.color}" fill-opacity="0.9" stroke="#fff" stroke-width="1.5"/>`;
+  }
+  paths += `<circle cx="${hub.x.toFixed(1)}" cy="${hub.y.toFixed(1)}" r="6" fill="${corr.color}" stroke="#fff" stroke-width="2"/>`;
+  svg.innerHTML = paths;
+}
+
+function render() {
+  const root = document.getElementById("root");
+  if (!root) return;
+  const stats = computeStats(state.items);
+  root.innerHTML = [
+    renderToolbar(),
+    renderCorrInsight(),
+    renderCanvasSheet(stats),
+    renderKpiStrip(stats),
+    `<div class="lower-grid">${renderMaturityPanel()}${renderSimulatorPanel()}${renderGapsPanel()}</div>`,
+  ].join("");
+  requestAnimationFrame(drawCorrelationLines);
+}
+
+/* Acciones de UI */
+function setFilterStatus(st) { state.filterStatus = st; saveState(); render(); }
+function toggleCorr(id) { state.activeCorr = state.activeCorr === id ? null : id; saveState(); render(); }
+function toggleLines(val) { state.showLines = !!val; saveState(); drawCorrelationLines(); }
+function toggleCompact() { state.compact = !state.compact; saveState(); render(); }
+function setSearch(val) {
+  state.search = val;
+  saveState();
+  const activeEl = document.activeElement;
+  const pos = activeEl && activeEl.selectionStart;
+  render();
+  const inp = document.querySelector(".search-input");
+  if (inp) {
+    inp.focus();
+    if (typeof pos === "number") inp.setSelectionRange(pos, pos);
+  }
+}
+
+function updateSim(key, raw) {
+  const v = Number(raw);
+  if (!Number.isFinite(v)) return;
+  state.sim[key] = key === "viviendas" ? normalizarViviendas(v) : v;
+  saveState();
+  const out = computeSimulatorOutput();
+  const map = {
+    comunidades: ["sv-com", String(state.sim.comunidades)],
+    viviendas: ["sv-viv", String(state.sim.viviendas)],
+    pctAnual: ["sv-anu", `${state.sim.pctAnual}%`],
+    addonsAnio: ["sv-add", eurP(state.sim.addonsAnio)],
+  };
+  const target = map[key];
+  if (target && document.getElementById(target[0])) {
+    document.getElementById(target[0]).textContent = target[1];
+  }
+  const box = document.getElementById("sim-results");
+  if (box) box.innerHTML = renderSimResultsHTML(out);
+}
+
+function openModal(itemId, defaultBlock = "propuesta") {
+  editingId = itemId;
+  const item = itemId ? state.items.find(x => x.id === itemId) : {
+    id: null,
+    block: defaultBlock,
+    status: "hipotesis",
+    title: "",
+    desc: "",
+    note: "",
+    corrs: state.activeCorr ? [state.activeCorr] : [],
+  };
+  if (!item) return;
+
+  document.getElementById("modal-title").textContent = itemId ? "Editar aspecto del Canvas" : "Nuevo aspecto del Canvas";
+  document.getElementById("m-block").innerHTML = BLOCKS.map(b => `<option value="${b.id}">${esc(b.title)}</option>`).join("");
+  document.getElementById("m-status").innerHTML = Object.entries(STATUS_META).map(([k, v]) => `<option value="${k}">${v.emoji} ${esc(v.label)}</option>`).join("");
+
+  document.getElementById("m-block").value = item.block;
+  document.getElementById("m-status").value = item.status;
+  document.getElementById("m-title").value = item.title;
+  document.getElementById("m-desc").value = item.desc;
+  document.getElementById("m-note").value = item.note;
+  document.getElementById("m-delete").style.display = itemId ? "inline-flex" : "none";
+
+  document.getElementById("m-corrs").innerHTML = CORRELATIONS.map(c => `
+    <label class="corr-check" style="border-color:${item.corrs.includes(c.id) ? c.color : "var(--line-strong)"}">
+      <input type="checkbox" value="${c.id}" ${item.corrs.includes(c.id) ? "checked" : ""}>
+      <span class="dot" style="background:${c.color}"></span>
+      ${esc(c.short)}
+    </label>
+  `).join("");
+
+  const bd = document.getElementById("modal-backdrop");
+  bd.classList.add("open");
+  bd.setAttribute("aria-hidden", "false");
+  document.getElementById("m-title").focus();
+}
+
+function closeModal() {
+  const bd = document.getElementById("modal-backdrop");
+  bd.classList.remove("open");
+  bd.setAttribute("aria-hidden", "true");
+  editingId = null;
+}
+
+function saveModalItem() {
+  const title = document.getElementById("m-title").value.trim();
+  if (!title) return alert("Escribe un título para la tarjeta.");
+  const block = document.getElementById("m-block").value;
+  const status = document.getElementById("m-status").value;
+  const desc = document.getElementById("m-desc").value.trim();
+  const note = document.getElementById("m-note").value.trim();
+  const corrs = [...document.querySelectorAll('#m-corrs input[type="checkbox"]:checked')].map(el => el.value);
+
+  if (editingId) {
+    const target = state.items.find(x => x.id === editingId);
+    if (target) Object.assign(target, { block, status, title, desc, note, corrs });
+  } else {
+    state.items.push({ id: "custom-" + Date.now(), block, status, title, desc, note, corrs });
+  }
+  saveState();
+  closeModal();
+  render();
+}
+
+function deleteModalItem() {
+  if (!editingId) return;
+  if (!confirm("¿Eliminar esta tarjeta del Canvas?")) return;
+  state.items = state.items.filter(x => x.id !== editingId);
+  saveState();
+  closeModal();
+  render();
+}
+
+function resetCanvas() {
+  if (!confirm("¿Restaurar el Canvas base de Vecinda? Se perderán las tarjetas editadas.")) return;
+  state = createInitialState();
+  saveState();
+  render();
+}
+
+function exportJSON() {
+  const payload = {
+    proyecto: "Vecinda",
+    exportado: new Date().toISOString(),
+    resumenDeterminacion: computeStats(state.items),
+    correlaciones: CORRELATIONS,
+    items: state.items,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "vecinda-business-model-canvas.json";
+  a.click();
+}
+
+function init() {
+  if (typeof VECINDA_CONFIG === "undefined") {
+    document.getElementById("root").innerHTML = `
+      <div class="error-banner">
+        <strong>No se pudo cargar <code>pricing.js</code>.</strong>
+        <p>Asegúrate de que <code>pricing.js</code> está en la misma carpeta que <code>canvas.html</code> para construir las tarifas dinámicamente.</p>
+      </div>
+    `;
+    return;
+  }
+
+  state = loadState();
+  render();
+
+  window.addEventListener("resize", () => requestAnimationFrame(drawCorrelationLines));
+  document.getElementById("modal-backdrop").addEventListener("click", e => {
+    if (e.target.id === "modal-backdrop") closeModal();
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeModal();
+  });
+}
+
+if (typeof document !== "undefined") {
+  init();
+}
+</script>
+</body>
+</html>
