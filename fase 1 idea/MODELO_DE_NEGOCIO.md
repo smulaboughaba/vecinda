@@ -38,7 +38,7 @@ Modelo híbrido por capas (estilo *Enterprise per-seat* + cartera):
 ## 3. Marco operativo, despliegue y estructura de costes
 - **Contratos de la gestora:** todos los contratos y la responsabilidad legal con las comunidades pertenecen a la gestoría; Vecinda únicamente ofrece el **hub operativo** y ellos lo usan.
 - **Captación orgánica inicial:** crecimiento orgánico sin inversión publicitaria de golpe, apoyado en la sencillez de uso.
-- **Despliegue y desarrollo ligero:** proyecto desarrollado como **hobby / equipo propio** (sin coste salarial directo) y desplegado inicialmente en **Vercel o Netlify**.
+- **Despliegue y desarrollo ligero:** proyecto desarrollado como **hobby / equipo propio** (sin coste salarial directo), con frontend en **Netlify**, entorno de pruebas en **Render Free** y producción en **OVH + Cloudflare R2** (ver [ARQUITECTURA.md](ARQUITECTURA.md)).
 - **Costes de despliegue retroalimentativos:** la carga real de servidor solo aumenta con operaciones de modificación, las cuales son exclusivas de **suscripciones** o acciones **Pay-as-you-go**. Por tanto, los costes de infraestructura **no pueden subir sin que antes suban los ingresos**.
 - **Números de pricing y pasarela:** las cifras exactas quedan abiertas para fase de validación; la pasarela (Stripe, PayPal u otra que permita cobrar como usuario independiente) se elegirá al implementar.
 

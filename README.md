@@ -33,6 +33,7 @@ Vecinda/
 │   └── backups/            # Scripts de backup cifrado de PostgreSQL -> Cloudflare R2 (Object Lock)
 └── fase 1 idea/            # Documentación inicial, Canvas y prototipo orientativo
     ├── ARQUITECTURA.md     # Diseño técnico, despliegue, caché y hardening de seguridad
+    ├── MARCO_NORMATIVO_Y_FUNCIONAL.md # Funcionamiento v1/v2, normativas ES/UE y plugins
     ├── MODELO_DE_NEGOCIO.md# Modelo de ingresos (gestorías, autogestionadas, colateral, marketplace)
     ├── TODO.md             # Hoja de ruta de validación, negocio y desarrollo
     ├── canvas.html         # Business Model Canvas interactivo (entregable)
@@ -46,6 +47,7 @@ Vecinda/
 ## Documentación y planes por módulo
 - **Estrategia y arquitectura global (`fase 1 idea/`):**
   - [ARQUITECTURA.md](fase%201%20idea/ARQUITECTURA.md) — Stack (`Vite + React` + `Rust`), entornos (`Netlify`, `Render Free`, `OVH`), caché y seguridad.
+  - [MARCO_NORMATIVO_Y_FUNCIONAL.md](fase%201%20idea/MARCO_NORMATIVO_Y_FUNCIONAL.md) — Funcionamiento v1/v2, normativas (RGPD, LPH, AI Act, eIDAS 2.0, DSA, Verifactu) y plugins.
   - [MODELO_DE_NEGOCIO.md](fase%201%20idea/MODELO_DE_NEGOCIO.md) — Las 4 fuentes de ingreso, jerarquía de ~5 usuarios activos y costes retroalimentativos.
   - [TODO.md](fase%201%20idea/TODO.md) — Hoja de ruta general de negocio, marco del Hub y desarrollo.
 - **Planes técnicos por carpeta:**

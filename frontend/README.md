@@ -3,6 +3,7 @@
 Interfaz web de Vecinda desplegada en **Netlify** (Deploy Previews en PRs/ramas de prueba y `main` en producción).
 
 > Guía visual y wireframes por cajas: ver [DESIGN.md](DESIGN.md).
+> Contrato oficial de API y tipos `camelCase`: ver [../backend/API_CONTRACT.md](../backend/API_CONTRACT.md).
 
 ---
 

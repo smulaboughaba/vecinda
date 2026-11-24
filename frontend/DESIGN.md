@@ -100,7 +100,7 @@ Pensada para resolverse en **< 1 minuto** desde el móvil (`max-width: 440px` ce
 +------------------------------------------+
 |  Puerta del garaje atascada  [En curso ] |
 |  Por 1ºA · 09 nov                        |
-|  [ Gremio libre: ver 3 presupuestos ]    |  <- Solo si no hay contrato
+|  [ Gremio libre: anuncios locales (Ad) ] |  <- Solo si no hay contrato (DSA)
 +------------------------------------------+
 ```
 
@@ -113,6 +113,7 @@ Pensada para resolverse en **< 1 minuto** desde el móvil (`max-width: 440px` ce
 |  [ 👍 A favor ]   [ 👎 En contra ]       |  <- Bloqueado para Conserje
 +------------------------------------------+
 ```
+*(Nota LPH: las votaciones rápidas de la app son **sondeos consultivos orientativos**; no sustituyen a una Junta formal LPH, que requiere doble mayoría con coeficientes de participación y verificación de deudas).*
 
 ---
 
