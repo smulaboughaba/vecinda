@@ -43,7 +43,13 @@ Vecinda/
 
 ---
 
-## Documentación clave (`fase 1 idea/`)
-- [ARQUITECTURA.md](fase%201%20idea/ARQUITECTURA.md) — Stack (`Vite + React` + `Rust`), entornos (`Netlify`, `Render Free`, `OVH`), caché y seguridad.
-- [MODELO_DE_NEGOCIO.md](fase%201%20idea/MODELO_DE_NEGOCIO.md) — Las 4 fuentes de ingreso, jerarquía de ~5 usuarios activos y costes retroalimentativos.
-- [TODO.md](fase%201%20idea/TODO.md) — Tareas pendientes de negocio, marco del Hub y desarrollo.
+## Documentación y planes por módulo
+- **Estrategia y arquitectura global (`fase 1 idea/`):**
+  - [ARQUITECTURA.md](fase%201%20idea/ARQUITECTURA.md) — Stack (`Vite + React` + `Rust`), entornos (`Netlify`, `Render Free`, `OVH`), caché y seguridad.
+  - [MODELO_DE_NEGOCIO.md](fase%201%20idea/MODELO_DE_NEGOCIO.md) — Las 4 fuentes de ingreso, jerarquía de ~5 usuarios activos y costes retroalimentativos.
+  - [TODO.md](fase%201%20idea/TODO.md) — Hoja de ruta general de negocio, marco del Hub y desarrollo.
+- **Planes técnicos por carpeta:**
+  - [frontend/README.md](frontend/README.md) — Plan por fases del cliente Vite + React + TS.
+  - [backend/README.md](backend/README.md) — Plan por fases de la API en Rust (`Axum` + `SQLx` + `moka`).
+  - [infra/README.md](infra/README.md) — Plan de Docker local, Render Free, OVH y backups anti-ransomware.
+  - [.github/workflows/README.md](.github/workflows/README.md) — Pipelines de CI/CD (tests, auditorías de seguridad y despliegues).
