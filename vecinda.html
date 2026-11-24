@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vecinda · Prototipo</title>
+<style>
+  :root { --bg:#eef2f1; --card:#fff; --ink:#16231f; --muted:#6b7a75; --brand:#0f766e; --brand-d:#0b5a54; --soft:#d9efec; --warn:#b45309; --bad:#b91c1c; --ok:#15803d; --line:#e1e8e6; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,Segoe UI,Roboto,sans-serif; display:grid; place-items:center; min-height:100vh; padding:16px; }
+  .phone { width:min(420px,100%); height:min(820px,calc(100vh - 32px)); background:var(--bg); border-radius:26px; box-shadow:0 20px 60px #0003; display:flex; flex-direction:column; overflow:hidden; border:1px solid var(--line); }
+  header { background:var(--brand); color:#fff; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; }
+  header h1 { margin:0; font-size:19px; letter-spacing:.3px; }
+  header small { opacity:.85; display:block; font-size:12px; }
+  header button { background:#ffffff26; color:#fff; border:0; border-radius:8px; padding:6px 10px; font-size:12px; cursor:pointer; }
+  main { flex:1; overflow:auto; padding:14px; }
+  nav { display:flex; background:var(--card); border-top:1px solid var(--line); }
+  nav button { flex:1; border:0; background:none; padding:10px 2px 8px; font-size:11px; color:var(--muted); cursor:pointer; }
+  nav button span { display:block; font-size:19px; }
+  nav button.on { color:var(--brand); font-weight:700; }
+  .card { background:var(--card); border-radius:14px; padding:14px; margin-bottom:12px; box-shadow:0 1px 3px #0001; }
+  .card h3 { margin:0 0 8px; font-size:15px; }
+  .row { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); font-size:14px; }
+  .row:last-child { border:0; }
+  .muted { color:var(--muted); font-size:12px; }
+  .big { font-size:28px; font-weight:700; }
+  .pos { color:var(--ok); } .neg { color:var(--bad); }
+  .tag { font-size:11px; padding:2px 8px; border-radius:99px; background:var(--soft); color:var(--brand-d); white-space:nowrap; }
+  .tag.warn { background:#fef3c7; color:var(--warn); } .tag.ok { background:#dcfce7; color:var(--ok); }
+  input, select, textarea { width:100%; font:inherit; padding:10px; border:1px solid var(--line); border-radius:10px; margin:4px 0 10px; background:#fff; }
+  label { font-size:12px; color:var(--muted); }
+  .btn { background:var(--brand); color:#fff; border:0; border-radius:10px; padding:11px 14px; font:inherit; font-weight:600; cursor:pointer; width:100%; }
+  .btn:hover { background:var(--brand-d); }
+  .btn.sec { background:var(--soft); color:var(--brand-d); }
+  .btn.sm { width:auto; padding:6px 10px; font-size:12px; }
+  .bar { height:10px; background:var(--line); border-radius:99px; overflow:hidden; margin:6px 0; display:flex; }
+  .bar i { display:block; height:100%; } .yes { background:var(--ok); } .no { background:var(--bad); }
+  .hyp { font-size:11px; color:var(--warn); background:#fffbeb; border:1px dashed #f5d38a; border-radius:8px; padding:6px 8px; margin-top:8px; }
+  .hero { text-align:center; padding:26px 8px 8px; } .hero h2 { margin:6px 0; font-size:26px; color:var(--brand-d); }
+  .check { display:flex; gap:8px; align-items:flex-start; font-size:12px; color:var(--muted); margin-bottom:12px; } .check input { width:auto; margin:2px 0 0; }
+  .actions { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+  .seg { display:flex; background:var(--soft); border-radius:10px; padding:3px; margin:8px 0; }
+  .seg button { flex:1; border:0; background:none; font:inherit; font-size:13px; padding:8px; border-radius:8px; color:var(--brand-d); cursor:pointer; }
+  .seg button.on { background:var(--brand); color:#fff; font-weight:600; }
+  .price { font-size:30px; font-weight:700; color:var(--brand-d); }
+  .tag.free { background:#dcfce7; color:var(--ok); }
+  .link { background:none; border:0; color:var(--brand); text-decoration:underline; font:inherit; font-size:13px; cursor:pointer; padding:4px; }
+  input[type=range] { padding:0; border:0; }
+  .svc { padding:10px 0; border-bottom:1px solid var(--line); } .svc:last-child { border:0; }
+  .svc .top { display:flex; justify-content:space-between; gap:8px; align-items:baseline; }
+  ul.inc { margin:6px 0 0; padding-left:18px; font-size:13px; } ul.inc li { margin:2px 0; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <header><div><h1>🏘️ Vecinda</h1><small id="sub"></small></div><button id="out" style="display:none">Salir</button></header>
+  <main id="main"></main>
+  <nav id="nav" style="display:none"></nav>
+</div>
+
+<script src="pricing.js"></script>
+<script>
+const KEY = "vecinda_v1";
+const eur = n => n.toLocaleString("es-ES", {style:"currency", currency:"EUR"});
+const eurP = n => n.toLocaleString("es-ES", {style:"currency", currency:"EUR", minimumFractionDigits:0, maximumFractionDigits:2});   // precios de tarifa
+const today = () => new Date().toLocaleDateString("es-ES", {day:"2-digit", month:"short"});
+const NOTA = VECINDA_CONFIG.notaValidacion;
+const hyp = t => `<div class="hyp">${t}</div>`;
+
+const seed = () => ({
+  user:null, tab:"inicio",
+  comunidad:{ nombre:"Comunidad C/ Ejemplo 12", ciudad:"Madrid", viviendas:40, plan:{estado:"base", ciclo:null, desde:null} },
+  servicios:[],
+  viviendas:{},     // por vivienda: titular, cuota, deuda, historial de titulares
+  traspasos:[],     // ventas / transmisiones de vivienda
+  gastos:[
+    {id:1, concepto:"Limpieza de escaleras", importe:-420, fecha:"01 nov"},
+    {id:2, concepto:"Ascensor · mantenimiento", importe:-185, fecha:"05 nov"},
+    {id:3, concepto:"Luz de zonas comunes", importe:-96.4, fecha:"10 nov"},
+    {id:4, concepto:"Cuotas de noviembre (36 de 40 pagadas)", importe:1980, fecha:"12 nov"},
+  ],
+  avisos:[
+    {id:1, titulo:"Corte de agua el jueves", texto:"De 10:00 a 13:00 por revisión de la bajante.", fecha:"14 nov"},
+    {id:2, titulo:"Junta ordinaria", texto:"Votación online abierta hasta el domingo (ver pestaña Votar).", fecha:"12 nov"},
+  ],
+  incidencias:[
+    {id:1, titulo:"Luz del portal parpadea", por:"3ºB", estado:"Abierta", fecha:"13 nov"},
+    {id:2, titulo:"Puerta del garaje atascada", por:"1ºA", estado:"En curso", fecha:"09 nov"},
+  ],
+  invitaciones:[
+    {codigo:"INQ-2048", vivienda:"3ºB", propietario:"Luis (demo)", inquilino:null},
+  ],
+  votaciones:[
+    {id:1, titulo:"Cambiar luces del portal a LED", detalle:"Presupuesto: 1.200 €. Ahorro estimado: 25 €/mes.", si:14, no:5, votado:[]},
+  ],
+});
+let S; try { S = JSON.parse(localStorage.getItem(KEY)) || seed(); } catch (e) { S = seed(); }
+S.invitaciones = S.invitaciones || seed().invitaciones;                 // datos guardados antes de este cambio
+if (S.user && S.user.rol === "vecino") S.user.rol = "propietario";      // migración del rol antiguo
+S.comunidad.plan = S.comunidad.plan || seed().comunidad.plan;           // datos guardados antes de los modelos de negocio
+S.servicios = S.servicios || [];
+S.viviendas = S.viviendas || {};
+S.traspasos = S.traspasos || [];
+const same = (a, b) => String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
+const getViv = v => S.viviendas[v] = S.viviendas[v] || {titular:null, cuota:55, deuda:0, historial:[]};
+const traspasoActivo = v => S.traspasos.find(t => t.vivienda === v && t.estado !== "completado" && t.estado !== "cancelado");
+let verVenta = false;   // formulario de venta abierto
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+const $ = id => document.getElementById(id);
+const isPres = () => S.user && S.user.rol === "presidente";
+const isConserje = () => S.user && S.user.rol === "conserje";
+const canOps = () => isPres() || isConserje();   // avisos e incidencias
+const isInq = () => S.user && S.user.rol === "inquilino";
+const voterKey = () => S.user.vivienda + (isInq() ? " (inq)" : "");
+const canVoteOn = v => canVote() || (isInq() && !!v.abiertaInq);   // el inquilino solo vota si el presidente abre la votación a inquilinos
+const canVote = () => isPres() || (S.user && S.user.rol === "propietario");   // el inquilino y el conserje no votan
+const rolLabel = () => isPres() ? "Presidente" : isConserje() ? "Conserje" : (isInq() ? "Inquilino " : "Propietario ") + S.user.vivienda;
+const nextId = a => a.reduce((m,x)=>Math.max(m,x.id),0)+1;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const TABS = [["inicio","🏠","Inicio"],["cuentas","💶","Cuentas"],["avisos","📢","Avisos"],["incidencias","🛠️","Incidencias"],["votar","🗳️","Votar"]];
+const tabsFor = () => isPres() ? [...TABS, ["plan","💼","Plan"]] : TABS;   // suscripción y servicios: solo presidente
+
+let verPlanes = false;   // pantalla pública de planes (antes de entrar)
+function render() {
+  const logged = !!S.user;
+  $("nav").style.display = $("out").style.display = logged ? "flex" : "none";
+  $("out").style.display = logged ? "block" : "none";
+  $("sub").textContent = logged ? `${S.comunidad.nombre} · ${rolLabel()}` : "Cuentas claras entre vecinos";
+  if (!logged) return verPlanes ? renderPlanesPublico() : renderWelcome();
+  if (S.user.rol === "propietario") {   // la vivienda pudo ser vendida mientras la sesión seguía abierta
+    const v = getViv(S.user.vivienda);
+    if (v.titular && !same(v.titular, S.user.nombre)) {
+      const viv = S.user.vivienda; S.user = null; save();
+      alert(`La vivienda ${viv} ya no está a tu nombre (fue transmitida). Tu acceso como propietario ha terminado.`);
+      return render();
+    }
+  }
+  if (isInq() && !S.invitaciones.some(i => i.vivienda === S.user.vivienda && same(i.inquilino, S.user.nombre))) {   // baja o código anulado
+    S.user = null; save(); alert("Tu acceso como inquilino ha sido dado de baja por el propietario."); return render();
+  }
+  if (S.tab === "plan" && !isPres()) S.tab = "inicio";
+  $("nav").innerHTML = tabsFor().map(([k,i,l]) => `<button class="${S.tab===k?"on":""}" onclick="go('${k}')"><span>${i}</span>${l}</button>`).join("");
+  $("main").innerHTML = ({inicio, cuentas, avisos, incidencias, votar, plan})[S.tab]();
+  $("main").scrollTop = 0;
+}
+const go = t => { S.tab = t; save(); render(); };
+$("out").onclick = () => { S.user = null; verPlanes = false; save(); render(); };
+
+/* ---------- Registro / onboarding ---------- */
+let mode = "propietario";
+function renderWelcome() {
+  $("main").innerHTML = `
+  <div class="hero"><div style="font-size:48px">🏘️</div><h2>Vecinda</h2>
+  <p class="muted">Cuentas visibles, avisos e incidencias en un solo sitio, y votaciones sin reuniones interminables.</p>
+  <p><span class="tag free">Gratis para vecinos</span> <button class="link" onclick="verPlanes=true;render()">Ver planes y precios</button></p></div>
+  <div class="card">
+    <div class="actions" style="margin:0 0 10px">
+      <button class="btn sm ${mode==="propietario"?"":"sec"}" style="flex:1" onclick="mode='propietario';renderWelcome()">Propietario</button>
+      <button class="btn sm ${mode==="inquilino"?"":"sec"}" style="flex:1" onclick="mode='inquilino';renderWelcome()">Inquilino</button>
+      <button class="btn sm ${mode==="presidente"?"":"sec"}" style="flex:1" onclick="mode='presidente';renderWelcome()">Presidente</button>
+      <button class="btn sm ${mode==="conserje"?"":"sec"}" style="flex:1" onclick="mode='conserje';renderWelcome()">Conserje</button>
+    </div>
+    <label>Nombre</label><input id="f_nombre" placeholder="Ana García">
+    ${mode==="conserje" ? `
+      <label>Código de tu comunidad</label><input id="f_cod" value="VEC-4821">
+      <div class="hyp">Hipótesis: el conserje puede gestionar avisos e incidencias, pero no ve datos personales ni vota. Falta validarlo con conserjes reales.</div>
+    ` : mode==="inquilino" ? `
+      <label>Código de invitación de tu propietario</label><input id="f_inv" placeholder="INQ-0000" style="text-transform:uppercase">
+      <div class="hyp">El propietario genera el código desde su pantalla de Inicio. Para probar: INQ-2048. Los inquilinos pueden ver cuentas y avisos y reportar incidencias, pero no votar.</div>
+    ` : mode==="propietario" ? `
+      <label>Vivienda (piso y puerta)</label><input id="f_viv" placeholder="2ºC">
+      <label>Código de tu comunidad</label><input id="f_cod" value="VEC-4821">
+    ` : `
+      <label>Nombre de la comunidad</label><input id="f_com" value="${esc(S.comunidad.nombre)}">
+      <label>Nº de viviendas</label><input id="f_nv" type="number" min="${VECINDA_CONFIG.suscripcion.minViviendas}" value="${S.comunidad.viviendas}" oninput="upd()">
+      <div class="card" style="background:var(--soft);box-shadow:none"><div class="muted">Suscripción opcional · la paga la comunidad</div><div id="pp">${precioResumenHTML(resumenPrecio(S.comunidad.viviendas))}</div>
+      <div class="muted" style="margin-top:6px">Empiezas con el Plan Base gratuito. Los vecinos nunca pagan.</div>${hyp(NOTA)}</div>
+    `}
+    <div class="check"><input type="checkbox" id="f_rgpd"><span>Acepto el tratamiento de mis datos para gestionar la comunidad (RGPD). <i>Texto legal pendiente de revisar.</i></span></div>
+    <button class="btn" onclick="enter()">${mode==="presidente" ? "Crear comunidad (≈5 min)" : "Entrar en menos de un minuto"}</button>
+  </div>
+  <p class="muted" style="text-align:center">Prototipo de práctica · los datos solo se guardan en tu navegador</p>`;
+}
+function upd() { $("pp").innerHTML = precioResumenHTML(resumenPrecio($("f_nv").value)); }
+const precioResumenHTML = r => `<div class="price">${eurP(r.mensual)}/mes</div><div class="muted">≈ ${eurP(r.porVivienda)} por vivienda al mes</div>`;
+function enter() {
+  const nombre = $("f_nombre").value.trim();
+  if (!nombre) return alert("Escribe tu nombre.");
+  if (!$("f_rgpd").checked) return alert("Debes aceptar el tratamiento de datos.");
+  if (mode === "conserje") {
+    S.user = {rol:"conserje", nombre, vivienda:"Portería"};
+  } else if (mode === "inquilino") {
+    const cod = $("f_inv").value.trim().toUpperCase();
+    const inv = S.invitaciones.find(i => i.codigo === cod);
+    if (!inv) return alert("Código no válido. Pídeselo a tu propietario.");
+    if (inv.inquilino && inv.inquilino !== nombre) return alert("Este código ya ha sido usado por otra persona.");
+    inv.inquilino = nombre;
+    S.user = {rol:"inquilino", nombre, vivienda:inv.vivienda};
+  } else if (mode === "propietario") {
+    const viv = $("f_viv").value.trim();
+    if (!viv) return alert("Indica tu vivienda.");
+    const v = getViv(viv);
+    if (v.titular && !same(v.titular, nombre)) return alert(`La vivienda ${viv} ya tiene titular. Si la has comprado, el presidente debe registrar el traspaso a tu nombre.`);
+    if (!v.titular) { v.titular = nombre; v.historial.push({nombre, desde:today(), hasta:null}); }
+    S.user = {rol:"propietario", nombre, vivienda:viv};
+  } else {
+    S.comunidad.nombre = $("f_com").value.trim() || S.comunidad.nombre;
+    S.comunidad.viviendas = normalizarViviendas($("f_nv").value);
+    S.user = {rol:"presidente", nombre, vivienda:"Presidencia"};
+  }
+  S.tab = "inicio"; save(); render();
+}
+
+/* ---------- Vistas ---------- */
+const saldo = () => S.gastos.reduce((s,g)=>s+g.importe, 0);
+
+function inicio() {
+  const abiertas = S.incidencias.filter(i=>i.estado!=="Resuelta").length;
+  const pend = S.votaciones.filter(v=>canVoteOn(v) && !v.votado.includes(voterKey())).length;
+  return `
+  <div class="card"><div class="muted">Hola, ${esc(S.user.nombre)} 👋</div>
+    <div class="muted" style="margin-top:8px">Saldo de la comunidad</div><div class="big ${saldo()>=0?"pos":"neg"}">${eur(saldo())}</div></div>
+  <div class="card"><h3>Pendiente</h3>
+    ${isConserje() ? "" : `<div class="row"><span>🗳️ Votaciones sin tu voto</span><span class="tag ${pend?"warn":"ok"}">${pend}</span></div>`}
+    <div class="row"><span>🛠️ Incidencias abiertas</span><span class="tag">${abiertas}</span></div>
+    <div class="row"><span>📢 Último aviso</span><span class="muted">${S.avisos[0] ? esc(S.avisos[0].titulo) : "—"}</span></div></div>
+  ${isPres() ? traspasosCard() + planResumenCard() : ""}
+  ${S.user.rol === "propietario" ? viviendaCard() + invitesCard() : ""}
+  ${isPres() || isConserje() ? "" : `<p class="muted">Tu cuenta de vecino es gratuita. Vecinda la financia la comunidad (si decide contratar un plan), nunca tú.</p>`}
+  <button class="btn sec" onclick="resetDemo()">Reiniciar datos de la demo</button>`;
+}
+function planResumenCard() {
+  const p = S.comunidad.plan, sus = p.estado === "suscrita";
+  const r = resumenPrecio(S.comunidad.viviendas, p.ciclo || "mensual");
+  return `<div class="card"><h3>Plan de la comunidad</h3>
+    ${sus ? `<div class="row"><span>Suscripción ${p.ciclo}</span><b>${eurP(r.totalPeriodo)}/${r.ciclo === "anual" ? "año" : "mes"}</b></div>
+      <div class="row"><span class="muted">${r.viviendas} viviendas</span><span class="muted">≈ ${eurP(r.porVivienda)}/vivienda/mes</span></div>`
+    : `<div class="row"><span>Plan Base</span><span class="tag free">Gratis</span></div>
+      <div class="muted">Avisos, incidencias y comunicación sin coste.</div>`}
+    <button class="btn sec" style="margin-top:8px" onclick="go('plan')">Ver suscripción y servicios</button></div>`;
+}
+function invitesCard() {
+  const mias = S.invitaciones.filter(i => i.vivienda === S.user.vivienda);
+  return `<div class="card"><h3>Mi inquilino</h3>
+    ${mias.length ? mias.map(i => `<div class="row"><div><b>${i.codigo}</b><div class="muted">${i.inquilino ? "Usado por " + esc(i.inquilino) : "Pendiente de usar"}</div></div>
+      <button class="btn sec sm" onclick="delInv('${i.codigo}')">${i.inquilino ? "Dar de baja" : "Anular"}</button></div>`).join("") : `<div class="muted">Aún no has invitado a ningún inquilino.</div>`}
+    <button class="btn" style="margin-top:8px" onclick="genInv()">Generar código de invitación</button>
+    <div class="hyp">Hipótesis: un código por inquilino, de un solo uso. Caducidad, cambio de inquilino y qué pasa si el propietario vende la vivienda: sin definir.</div></div>`;
+}
+/* ---------- Propietario: mi vivienda y venta / traspaso ---------- */
+const ESTADO_TRASP = {solicitado:"Esperando certificado del presidente", certificado:"Certificado emitido · falta registrar al nuevo titular"};
+function viviendaCard() {
+  const v = getViv(S.user.vivienda), t = traspasoActivo(S.user.vivienda), inq = S.invitaciones.filter(i => i.vivienda === S.user.vivienda && i.inquilino);
+  const ant = S.traspasos.filter(x => x.vivienda === S.user.vivienda && x.estado === "completado").length;
+  return `<div class="card"><h3>Mi vivienda · ${esc(S.user.vivienda)}</h3>
+    <div class="row"><span>Cuota mensual</span><b>${eurP(v.cuota)}</b></div>
+    <div class="row"><span>Estado de pagos</span>${v.deuda > 0 ? `<span class="tag warn">Pendiente ${eurP(v.deuda)}</span>` : `<span class="tag ok">Al corriente</span>`}</div>
+    <div class="row"><span>Inquilino</span><span class="muted">${inq.length ? esc(inq.map(i => i.inquilino).join(", ")) : "Ninguno"}</span></div>
+    <div class="row"><span>Titulares anteriores</span><span class="muted">${ant}</span></div>
+    ${t ? `<div class="hyp" style="color:var(--brand-d);background:var(--soft);border-color:var(--brand)"><b>Venta en curso</b>${t.comprador ? " a " + esc(t.comprador) : ""} · ${ESTADO_TRASP[t.estado]}
+        ${t.estado === "certificado" ? `<div style="margin-top:4px">Deuda certificada: <b>${eurP(t.deuda)}</b></div><div class="actions"><button class="btn sec sm" onclick="descargarCertificado(${t.id})">📄 Certificado de deuda</button></div>` : ""}
+        <div class="actions"><button class="btn sec sm" onclick="cancelarVenta(${t.id})">Cancelar venta</button></div></div>`
+    : verVenta ? ventaForm() : `<button class="btn sec" style="margin-top:8px" onclick="verVenta=true;render()">Vender o transmitir mi vivienda</button>`}</div>`;
+}
+function ventaForm() {
+  const hayInq = S.invitaciones.some(i => i.vivienda === S.user.vivienda);
+  return `<div style="margin-top:10px"><b style="font-size:14px">Vender mi vivienda</b>
+    <div class="muted" style="margin:4px 0 8px">Avisa a la comunidad. Mientras no se registre el cambio, sigues siendo el titular.</div>
+    <label>Nombre del comprador (opcional)</label><input id="t_comp" placeholder="Si ya lo sabes">
+    <label>Fecha prevista de la escritura</label><input id="t_fecha" type="date">
+    ${hayInq ? `<label>¿Qué pasa con tu inquilino?</label><select id="t_inq"><option value="sigue">Sigue en la vivienda (el contrato de alquiler continúa con el comprador)</option><option value="baja">Se le da de baja de Vecinda</option></select>` : ""}
+    <div class="hyp" style="margin:0 0 10px">Hipótesis: al vender, la vivienda conserva sus deudas con la comunidad. Por ley (LPH art. 9) el comprador responde de las cuotas del año en curso y del anterior, y el vendedor debe aportar un certificado de estar al corriente. Por verificar.</div>
+    <div class="actions"><button class="btn sm" onclick="pedirVenta()">Solicitar certificado y avisar</button><button class="btn sec sm" onclick="verVenta=false;render()">Cancelar</button></div></div>`;
+}
+function pedirVenta() {
+  const viv = S.user.vivienda; if (traspasoActivo(viv)) return;
+  S.traspasos.push({id:nextId(S.traspasos), vivienda:viv, vendedor:S.user.nombre, comprador:$("t_comp").value.trim(), fecha:$("t_fecha").value,
+    inquilino:$("t_inq") ? $("t_inq").value : "sigue", estado:"solicitado", deuda:null, creado:today()});
+  verVenta = false; save(); render();
+}
+function cancelarVenta(id) {
+  const t = S.traspasos.find(x => x.id === id);
+  if (!t || !confirm("¿Cancelar la venta? Seguirás como titular.")) return;
+  t.estado = "cancelado"; save(); render();
+}
+function descargarCertificado(id) {
+  const t = S.traspasos.find(x => x.id === id), al = t.deuda <= 0;
+  const txt = [`CERTIFICADO DE DEUDA · ${S.comunidad.nombre}`, `Fecha: ${t.certFecha}`, "", `Vivienda: ${t.vivienda}`, `Titular vendedor: ${t.vendedor}`, `Comprador: ${t.comprador || "(sin indicar)"}`, "",
+    al ? "La vivienda se encuentra AL CORRIENTE de pago con la comunidad." : `La vivienda tiene cuotas pendientes por importe de ${eurP(t.deuda)}.`, "", "Generado por Vecinda (prototipo, sin validez legal)."].join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([txt], {type:"text/plain"})); a.download = `certificado-${t.vivienda}.txt`; a.click();
+}
+
+/* ---------- Presidente: gestión de traspasos ---------- */
+function traspasosCard() {
+  const act = S.traspasos.filter(t => t.estado === "solicitado" || t.estado === "certificado");
+  if (!act.length) return "";
+  return `<div class="card"><h3>🔑 Ventas de vivienda</h3>
+    ${act.map(t => `<div class="svc"><div class="top"><b>${esc(t.vivienda)} · ${esc(t.vendedor)}</b><span class="tag ${t.estado === "certificado" ? "ok" : "warn"}">${t.estado}</span></div>
+      <div class="muted">Comprador: ${t.comprador ? esc(t.comprador) : "sin indicar"}${t.fecha ? " · escritura " + t.fecha : ""} · Inquilino: ${t.inquilino === "baja" ? "se da de baja" : "sigue"}</div>
+      ${t.estado === "solicitado" ? `<label>Deuda pendiente de la vivienda (€)</label><input id="d_${t.id}" type="number" min="0" step="0.01" value="${getViv(t.vivienda).deuda}">
+        <button class="btn sm" onclick="emitirCertificado(${t.id})">Emitir certificado</button>`
+      : `<div class="muted">Deuda certificada: <b>${eurP(t.deuda)}</b></div><button class="btn sm" style="margin-top:6px" onclick="completarVenta(${t.id})">Registrar nuevo titular</button>`}</div>`).join("")}
+    <div class="hyp">Hipótesis: el presidente emite el certificado y registra el cambio tras ver la escritura. Qué documento exigir como prueba: sin definir.</div></div>`;
+}
+function emitirCertificado(id) {
+  const t = S.traspasos.find(x => x.id === id), d = parseFloat($("d_" + id).value);
+  if (isNaN(d) || d < 0) return alert("Indica una deuda válida (0 si está al corriente).");
+  getViv(t.vivienda).deuda = d; t.deuda = d; t.certFecha = today(); t.estado = "certificado"; save(); render();
+}
+function completarVenta(id) {
+  const t = S.traspasos.find(x => x.id === id); if (!t) return;
+  let comp = t.comprador;
+  if (!comp) { comp = (prompt("Nombre del nuevo titular:") || "").trim(); if (!comp) return; }
+  if (!confirm(`Vivienda ${t.vivienda}: ${t.vendedor} deja de ser titular y pasa a ${comp}.\n` +
+    (t.deuda > 0 ? `La deuda de ${eurP(t.deuda)} se queda con la vivienda.\n` : "") +
+    (t.inquilino === "baja" ? "Se dará de baja al inquilino.\n" : "") + "\n¿Confirmas?")) return;
+  const v = getViv(t.vivienda), h = v.historial[v.historial.length - 1];
+  if (h && !h.hasta) h.hasta = today();
+  v.titular = comp; v.historial.push({nombre:comp, desde:today(), hasta:null});
+  S.invitaciones = S.invitaciones.filter(i => i.vivienda !== t.vivienda || t.inquilino !== "baja");   // baja: se anulan sus códigos y accesos
+  t.comprador = comp; t.estado = "completado"; t.fechaCierre = today(); save(); render();
+}
+function genInv() {
+  let c; do { c = "INQ-" + Math.floor(1000 + Math.random() * 9000); } while (S.invitaciones.some(i => i.codigo === c));
+  S.invitaciones.push({codigo:c, vivienda:S.user.vivienda, propietario:S.user.nombre, inquilino:null}); save(); render();
+}
+function delInv(c) { S.invitaciones = S.invitaciones.filter(i => i.codigo !== c); save(); render(); }
+
+/* ---------- Planes, calculadora y servicios (precios: ver pricing.js) ---------- */
+let calcN = null, calcCiclo = "mensual";
+const RANGE_MIN = 10, RANGE_MAX = 120;
+
+function calcCard() {
+  const cfg = VECINDA_CONFIG.suscripcion;
+  if (calcN === null) calcN = S.comunidad.viviendas;
+  const sl = Math.min(RANGE_MAX, Math.max(RANGE_MIN, calcN));
+  return `<div class="card"><h3>Calculadora de cuota</h3>
+    <label>Número de viviendas de la comunidad</label>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
+      <input id="c_rng" type="range" min="${RANGE_MIN}" max="${RANGE_MAX}" value="${sl}" oninput="calcSet(this.value)" style="margin:0;flex:1">
+      <input id="c_num" type="number" min="${cfg.minViviendas}" max="${cfg.maxViviendas}" value="${calcN}" oninput="calcSet(this.value,true)" style="width:84px;margin:0">
+    </div>
+    <div class="seg">
+      <button class="${calcCiclo==="mensual"?"on":""}" onclick="calcCic('mensual')">Mensual</button>
+      <button class="${calcCiclo==="anual"?"on":""}" onclick="calcCic('anual')">Anual · ${cfg.mesesGratisAnual} meses gratis</button>
+    </div>
+    <div id="c_out">${calcOut()}</div>
+    ${hyp(NOTA + " Cifras de una práctica académica, aún no validadas con presidentes reales.")}</div>`;
+}
+function calcOut() {
+  const cfg = VECINDA_CONFIG.suscripcion, r = resumenPrecio(calcN, calcCiclo), [lo, hi] = cfg.rangoObjetivo;
+  const per = r.ciclo === "anual" ? "año" : "mes";
+  const p = S.comunidad.plan, comprar = S.user && isPres() && S.tab === "plan";
+  const actual = p.estado === "suscrita" && p.ciclo === r.ciclo && S.comunidad.viviendas === r.viviendas;
+  return `<div class="price">${eurP(r.totalPeriodo)}<span style="font-size:15px">/${per}</span></div>
+    <div class="muted">Coste total para la comunidad (${r.viviendas} viviendas)</div>
+    <div class="row" style="margin-top:6px"><span>Por vivienda</span><b>${eurP(r.porVivienda)}/mes</b></div>
+    ${r.ciclo === "anual" ? `<div class="row"><span>Equivale a</span><b>${eurP(r.equivMensual)}/mes</b></div>
+      <div class="row"><span>Ahorro frente a pagar mensual</span><b class="pos">${eurP(r.ahorroAnual)}</b></div>` : ""}
+    <div class="muted" style="margin-top:6px">Lo paga la comunidad, aprobado por presidente y vecinos. Ningún vecino paga por su cuenta.</div>
+    ${r.viviendas < lo || r.viviendas > hi ? `<div class="muted">Fuera del rango objetivo (${lo}–${hi} viviendas): tarifa todavía menos validada.</div>` : ""}
+    ${comprar ? (actual ? `<div class="tag ok" style="margin-top:8px;display:inline-block">Este es tu plan actual</div>`
+        : `<button class="btn" style="margin-top:10px" onclick="contratarSuscripcion()">${p.estado === "suscrita" ? "Cambiar suscripción" : "Contratar"} · ${r.viviendas} viviendas · ${eurP(r.totalPeriodo)}/${per}</button>`)
+      + (p.estado === "suscrita" ? `<button class="link" onclick="cancelarSuscripcion()">Cancelar y volver al Plan Base gratuito</button>` : "") : ""}`;
+}
+function calcSet(v, fromNum) {
+  calcN = normalizarViviendas(v);
+  if (fromNum) $("c_rng").value = Math.min(RANGE_MAX, Math.max(RANGE_MIN, calcN)); else $("c_num").value = calcN;
+  $("c_out").innerHTML = calcOut();
+}
+function calcCic(c) { calcCiclo = c; render(); }
+
+function planesCards() {
+  const c = VECINDA_CONFIG.suscripcion;
+  return `<div class="card"><div class="top" style="display:flex;justify-content:space-between"><h3>Plan Base</h3><span class="tag free">Gratis</span></div>
+      <div class="muted">Para toda comunidad y todos los vecinos: comunicación, tablón de avisos y reporte de incidencias, sin coste. Sin tarjeta.</div></div>
+    <div class="card"><h3>Suscripción de la comunidad</h3>
+      <div class="price">desde ${eurP(c.cuotaBaseMensual)}/mes</div>
+      <div class="muted">Hasta ${c.viviendasIncluidas} viviendas. Después, +${eurP(c.extraPorVivienda)}/mes por cada vivienda adicional. Pago anual: ${c.mesesGratisAnual} meses gratis.</div>
+      <div class="muted" style="margin-top:6px">La contrata el presidente con el acuerdo de la comunidad. Los vecinos nunca pagan.</div>
+      ${hyp(NOTA + " Prototipo: el reparto de funciones entre Plan Base y Suscripción aún no se aplica en la app.")}</div>`;
+}
+function serviciosCard(inter) {
+  return `<div class="card"><h3>Servicios a la carta</h3><div class="muted">Pago puntual con cargo a la comunidad, solo si los necesitas.</div>
+    ${VECINDA_CONFIG.servicios.map(s => {
+      const hecho = inter && s.unidad === "pago único" && S.servicios.some(x => x.servicio === s.id);
+      return `<div class="svc"><div class="top"><b>${s.icono} ${esc(s.nombre)}</b><b>${eurP(s.precio)}</b></div>
+        <div class="muted">${esc(s.unidad)} · ${esc(s.descripcion)}</div>
+        ${!inter ? "" : hecho ? `<span class="tag ok" style="margin-top:6px;display:inline-block">Contratado ✓</span>`
+          : `<button class="btn sm" style="margin-top:6px" onclick="contratar('${s.id}')">Contratar por ${eurP(s.precio)}</button>`}</div>`;
+    }).join("")}${hyp(NOTA)}</div>`;
+}
+function marketplaceCard() {
+  return `<div class="card"><h3>🔧 Presupuestos de gremios</h3><span class="tag free">Gratis para la comunidad</span>
+    <div class="muted" style="margin-top:6px">Desde cualquier incidencia, el presidente puede solicitar ${VECINDA_CONFIG.marketplace.presupuestosPorSolicitud} presupuestos homologados. Servicio gratuito para la comunidad: lo financian los proveedores homologados.</div></div>`;
+}
+function renderPlanesPublico() {
+  $("main").innerHTML = `<button class="link" onclick="verPlanes=false;render()">← Volver</button>
+    <div class="hero" style="padding-top:6px"><h2>Planes y precios</h2>
+    <p class="muted">Paga la comunidad, no los vecinos. Cada vecino usa Vecinda gratis.</p></div>
+    ${planesCards()}${calcCard()}${serviciosCard(false)}${marketplaceCard()}`;
+}
+function plan() {
+  const p = S.comunidad.plan, hist = S.servicios.slice().reverse();
+  return `<div class="card"><h3>Tu plan</h3>
+      ${p.estado === "suscrita" ? `<div class="row"><span>Suscripción ${p.ciclo}</span><span class="tag ok">Activa desde ${p.desde}</span></div>`
+        : `<div class="row"><span>Plan Base</span><span class="tag free">Gratis</span></div>`}
+      <div class="muted">Los cargos los paga la comunidad y se publican en Cuentas, visibles para todos los vecinos. Los vecinos no pagan nada.</div></div>
+    ${calcCard()}${serviciosCard(true)}
+    ${hist.length ? `<div class="card"><h3>Servicios contratados</h3>${hist.map(h => {
+      const s = VECINDA_CONFIG.servicios.find(x => x.id === h.servicio);
+      return `<div class="row"><div>${esc(s.nombre)}${h.detalle ? `<div class="muted">Vivienda ${esc(h.detalle)} · solo visible para presidencia</div>` : ""}<div class="muted">${h.fecha}</div></div><b>${eurP(h.importe)}</b></div>`;
+    }).join("")}</div>` : ""}
+    ${marketplaceCard()}`;
+}
+function contratarSuscripcion() {
+  const r = resumenPrecio(calcN, calcCiclo);
+  if (!confirm(`Se cargarán ${eurP(r.totalPeriodo)} (${r.ciclo}) a la cuenta de la comunidad. Los vecinos no pagan nada.\n\n¿Confirmas que la comunidad ha aprobado esta contratación?`)) return;
+  S.comunidad.viviendas = r.viviendas;
+  S.comunidad.plan = {estado:"suscrita", ciclo:r.ciclo, desde:today()};
+  S.gastos.push({id:nextId(S.gastos), concepto:`Suscripción Vecinda (${r.ciclo}, ${r.viviendas} viviendas)`, importe:-r.totalPeriodo, fecha:today()});
+  save(); render();
+}
+function cancelarSuscripcion() {
+  if (!confirm("¿Volver al Plan Base gratuito?")) return;
+  S.comunidad.plan = {estado:"base", ciclo:null, desde:null}; save(); render();
+}
+function contratar(id) {
+  const s = VECINDA_CONFIG.servicios.find(x => x.id === id);
+  if (!s || !isPres()) return;
+  let detalle = "";
+  if (id === "morosos") { detalle = (prompt("Vivienda con la deuda (no se mostrará a los vecinos):") || "").trim(); if (!detalle) return; }
+  if (!confirm(`Se cargarán ${eurP(s.precio)} a la cuenta de la comunidad por «${s.nombre}».\n\n¿Confirmas que la comunidad ha aprobado este gasto?`)) return;
+  S.servicios.push({id:nextId(S.servicios), servicio:id, detalle, importe:s.precio, fecha:today()});
+  S.gastos.push({id:nextId(S.gastos), concepto:`Vecinda · ${s.nombre}${id === "morosos" ? " (expediente)" : ""}`, importe:-s.precio, fecha:today()});
+  save(); render();
+}
+const hasJunta = () => S.servicios.some(x => x.servicio === "junta");
+function descargarActa(id) {
+  const v = S.votaciones.find(x => x.id === id);
+  const res = v.si > v.no ? "APROBADO" : v.si < v.no ? "RECHAZADO" : "EMPATE";
+  const txt = [`ACTA · ${S.comunidad.nombre}`, `Fecha: ${new Date().toLocaleDateString("es-ES")}`, "", `Punto: ${v.titulo}`, v.detalle, "",
+    `Votos a favor: ${v.si}`, `Votos en contra: ${v.no}`, `Resultado: ${res}`, "", "Generada por Vecinda (prototipo, sin validez legal)."].join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([txt], {type:"text/plain"})); a.download = "acta.txt"; a.click();
+}
+
+function resetDemo() { if (confirm("¿Borrar todos los datos de la demo?")) { S = seed(); save(); render(); } }
+
+function cuentas() {
+  const ing = S.gastos.filter(g=>g.importe>0).reduce((s,g)=>s+g.importe,0);
+  const gas = -S.gastos.filter(g=>g.importe<0).reduce((s,g)=>s+g.importe,0);
+  return `
+  <div class="card"><div class="muted">Saldo actual</div><div class="big ${saldo()>=0?"pos":"neg"}">${eur(saldo())}</div>
+    <div class="row"><span>Ingresos</span><b class="pos">${eur(ing)}</b></div>
+    <div class="row"><span>Gastos</span><b class="neg">${eur(gas)}</b></div></div>
+  <div class="card"><h3>Movimientos (visibles para todos)</h3>
+    ${S.gastos.slice().reverse().map(g=>`<div class="row"><div>${esc(g.concepto)}<div class="muted">${g.fecha}</div></div><b class="${g.importe>=0?"pos":"neg"}">${eur(g.importe)}</b></div>`).join("")}</div>
+  ${isPres() ? `<div class="card"><h3>Añadir movimiento</h3>
+    <label>Concepto</label><input id="g_c">
+    <label>Importe (negativo = gasto)</label><input id="g_i" type="number" step="0.01" placeholder="-150">
+    <button class="btn" onclick="addGasto()">Publicar</button></div>` : ""}`;
+}
+function addGasto() {
+  const c = $("g_c").value.trim(), i = parseFloat($("g_i").value);
+  if (!c || isNaN(i)) return alert("Rellena concepto e importe.");
+  S.gastos.push({id:nextId(S.gastos), concepto:c, importe:i, fecha:today()}); save(); render();
+}
+
+function avisos() {
+  return `${canOps() ? `<div class="card"><h3>Nuevo aviso</h3>
+    <label>Título</label><input id="a_t"><label>Mensaje</label><textarea id="a_x" rows="2"></textarea>
+    <button class="btn" onclick="addAviso()">Enviar a todos los vecinos</button></div>` : ""}
+  ${S.avisos.map(a=>`<div class="card"><h3>${esc(a.titulo)}</h3><div>${esc(a.texto)}</div><div class="muted" style="margin-top:6px">${a.fecha}</div></div>`).join("")}`;
+}
+function addAviso() {
+  const t = $("a_t").value.trim(); if (!t) return alert("Escribe un título.");
+  S.avisos.unshift({id:nextId(S.avisos), titulo:t, texto:$("a_x").value.trim(), fecha:today()}); save(); render();
+}
+
+function incidencias() {
+  const cls = {Abierta:"warn", "En curso":"", Resuelta:"ok"};
+  return `<div class="card"><h3>Comunicar incidencia</h3>
+    <input id="i_t" placeholder="Ej.: Gotera en el garaje"><button class="btn" onclick="addInc()">Enviar</button></div>
+  ${S.incidencias.map(i=>`<div class="card"><div class="row" style="border:0"><b>${esc(i.titulo)}</b><span class="tag ${cls[i.estado]}">${i.estado}</span></div>
+    <div class="muted">${esc(i.por)} · ${i.fecha}</div>
+    ${i.presupuestos ? `<div class="tag" style="margin-top:6px;display:inline-block">🔧 ${i.presupuestos.n} presupuestos solicitados · ${i.presupuestos.fecha}</div>` : ""}
+    ${isPres() && !i.presupuestos && i.estado !== "Resuelta" ? `<div class="actions"><button class="btn sm" onclick="pedirPresupuestos(${i.id})">Solicitar ${VECINDA_CONFIG.marketplace.presupuestosPorSolicitud} presupuestos homologados</button></div>
+      <div class="muted" style="margin-top:4px">Servicio gratuito para la comunidad — financiado por proveedores homologados.</div>` : ""}
+    ${canOps() ? `<div class="actions">${["Abierta","En curso","Resuelta"].filter(e=>e!==i.estado).map(e=>`<button class="btn sec sm" onclick="setInc(${i.id},'${e}')">→ ${e}</button>`).join("")}</div>` : ""}</div>`).join("")}`;
+}
+function addInc() {
+  const t = $("i_t").value.trim(); if (!t) return;
+  S.incidencias.unshift({id:nextId(S.incidencias), titulo:t, por:S.user.vivienda + (isInq() ? " (inquilino)" : ""), estado:"Abierta", fecha:today()}); save(); render();
+}
+function pedirPresupuestos(id) {
+  const i = S.incidencias.find(x => x.id === id), n = VECINDA_CONFIG.marketplace.presupuestosPorSolicitud;
+  if (!i || !isPres() || i.presupuestos) return;
+  if (!confirm(`Se pedirán ${n} presupuestos a gremios homologados.\nServicio gratuito para la comunidad — financiado por proveedores homologados.\nSolo se comparte la descripción de la avería, sin datos de vecinos.\n\n¿Solicitar?`)) return;
+  i.presupuestos = {n, fecha:today()}; save(); render();
+}
+function setInc(id, e) { S.incidencias.find(i=>i.id===id).estado = e; save(); render(); }
+
+function votar() {
+  return `${isPres() ? `<div class="card"><h3>Nueva votación</h3>
+    <label>Propuesta</label><input id="v_t"><label>Detalle (coste, plazos…)</label><textarea id="v_d" rows="2"></textarea>
+    <div class="check"><input type="checkbox" id="v_inq"><span>Abrir esta votación a inquilinos</span></div>
+    ${hasJunta() ? `<div class="check"><input type="checkbox" id="v_junta"><span>Es una Junta General (voto certificado y acta automática)</span></div>`
+      : `<div class="muted" style="margin-bottom:10px">Estas votaciones son simples y gratuitas. Para una Junta General con voto certificado y acta automática: <button class="link" onclick="go('plan')">Pack Junta General Online (${eurP(VECINDA_CONFIG.servicios.find(s => s.id === "junta").precio)})</button></div>`}
+    <div class="hyp" style="margin:-4px 0 10px">Hipótesis: si se abre, los inquilinos votan aparte de su propietario y el resultado es solo orientativo. Según la Ley de Propiedad Horizontal, en las juntas solo votan propietarios (por verificar).</div>
+    <button class="btn" onclick="addVoto()">Abrir votación</button></div>` : ""}
+  ${S.votaciones.map(v=>{
+    const tot = v.si+v.no, p = tot ? Math.round(v.si/tot*100) : 0, ya = v.votado.includes(voterKey());
+    return `<div class="card"><h3>${esc(v.titulo)} ${v.junta ? `<span class="tag ok">Junta General</span>` : ""} ${v.abiertaInq ? `<span class="tag">Abierta a inquilinos</span>` : ""}</h3><div class="muted">${esc(v.detalle)}</div>
+      <div class="bar"><i class="yes" style="width:${tot?v.si/tot*100:0}%"></i><i class="no" style="width:${tot?v.no/tot*100:0}%"></i></div>
+      <div class="muted">${v.si} a favor · ${v.no} en contra · ${v.abiertaInq ? tot + " votos" : "participación " + tot + "/" + S.comunidad.viviendas + " viviendas"} (${p}% sí)</div>
+      ${!canVoteOn(v) ? `<div class="tag" style="margin-top:8px;display:inline-block">Solo lectura: ${isInq() ? "esta votación no está abierta a inquilinos" : "el conserje no vota"}</div>` : ya ? `<div class="tag ok" style="margin-top:8px;display:inline-block">Ya has votado (1 voto por vivienda)</div>`
+           : `<div class="actions"><button class="btn sm" onclick="vote(${v.id},'si')">👍 A favor</button><button class="btn sec sm" onclick="vote(${v.id},'no')">👎 En contra</button></div>`}
+      ${isPres() && v.junta ? `<div class="actions"><button class="btn sec sm" onclick="descargarActa(${v.id})">📄 Generar acta</button></div>` : ""}</div>`;
+  }).join("")}
+  <p class="muted">Aviso: la validez legal de una votación online según la Ley de Propiedad Horizontal está por verificar.</p>`;
+}
+function addVoto() {
+  const t = $("v_t").value.trim(); if (!t) return alert("Escribe la propuesta.");
+  S.votaciones.unshift({id:nextId(S.votaciones), titulo:t, detalle:$("v_d").value.trim(), si:0, no:0, votado:[], abiertaInq:$("v_inq").checked, junta:!!($("v_junta") && $("v_junta").checked && hasJunta())}); save(); render();
+}
+function vote(id, o) {
+  const v = S.votaciones.find(x=>x.id===id);
+  if (!canVoteOn(v) || v.votado.includes(voterKey())) return;
+  v[o]++; v.votado.push(voterKey()); save(); render();
+}
+
+render();
+</script>
+</body>
+</html>
