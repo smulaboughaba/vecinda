@@ -13,7 +13,7 @@ Configuración de entornos para mantener **0 €/mes en pruebas** y un coste fij
 
 ## Plan de implementación por fases
 - **Fase 0 · Local y Staging (0 €):**
-  - [ ] Crear `docker/docker-compose.yml` con PostgreSQL 16 local (usuario de app sin `SUPERUSER`).
+  - [x] Crear `docker/docker-compose.yml` con PostgreSQL 16 local (usuario de app `vecinda_app` sin `SUPERUSER` en `docker/init-app-user.sql` y script `docker/verify-db.ps1`).
   - [ ] Crear `docker/Dockerfile` multi-stage para el binario Rust (imagen mínima final + usuario `non-root`).
   - [ ] Conectar despliegue de pruebas en **Render Free** + PostgreSQL Free (Neon/Supabase).
 - **Fase 1 · Producción y Hardening en OVH:**

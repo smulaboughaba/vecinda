@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vecinda-postgres
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_DB: vecinda_dev
+      POSTGRES_USER: vecinda_admin
+      POSTGRES_PASSWORD: vecinda_local_pass
+    volumes:
+      - vecinda_pgdata:/var/lib/postgresql/data
+      - ./init-app-user.sql:/docker-entrypoint-initdb.d/01-init-app-user.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vecinda_admin -d vecinda_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  vecinda_pgdata:
